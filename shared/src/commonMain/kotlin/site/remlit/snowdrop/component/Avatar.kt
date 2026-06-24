@@ -17,11 +17,14 @@ import site.remlit.snowdrop.model.User
 const val bigAvatarSize = 84
 const val avatarSize = 48
 
+const val bigAvatarRadius = 20
+const val avatarRadius = 15
+
 @Composable
 fun Avatar(user: User, big: Boolean = false) {
 
 	val size = if (big) bigAvatarSize.dp else avatarSize.dp
-	val radius = if (big) 20.dp else 15.dp
+	val radius = if (big) bigAvatarRadius.dp else avatarRadius.dp
 
 	@Composable
 	fun fallback() {

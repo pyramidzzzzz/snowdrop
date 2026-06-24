@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -34,9 +36,13 @@ import io.kamel.image.asyncPainterResource
 import kotlinx.coroutines.Dispatchers
 import site.remlit.snowdrop.api.accounts.getAccount
 import site.remlit.snowdrop.component.Avatar
+import site.remlit.snowdrop.component.bigAvatarRadius
 import site.remlit.snowdrop.component.bigAvatarSize
 import site.remlit.snowdrop.model.User
+import site.remlit.snowdrop.util.formatNumber
 import site.remlit.snowdrop.util.getCurrentAccountObjectFlow
+
+const val headerHeight = 200
 
 @Composable
 fun Profile(id: String) {
@@ -61,7 +67,7 @@ fun Profile(id: String) {
 			else Column {
 				Text(account!!.displayName ?: account!!.username)
 				Text(
-					"${account!!.statusesCount} posts",
+					"${formatNumber(account!!.statusesCount)} posts",
 					fontSize = 14.sp
 				)
 			}
@@ -83,7 +89,7 @@ fun Profile(id: String) {
 				fun fallbackHeader() {
 					Box(
 						modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainerHigh)
-							.height(125.dp)
+							.height(headerHeight.dp)
 							.fillMaxWidth()
 					)
 				}
@@ -93,7 +99,7 @@ fun Profile(id: String) {
 						{ asyncPainterResource(account!!.header!!) },
 						account!!.headerDescription,
 						onLoading = { fallbackHeader() },
-						modifier = Modifier.height(200.dp)
+						modifier = Modifier.height(headerHeight.dp)
 							.fillMaxWidth(),
 						contentScale = ContentScale.Crop
 
@@ -107,10 +113,21 @@ fun Profile(id: String) {
 				) {
 					Row(
 						modifier = Modifier.padding(bottom = 10.dp),
+
 						verticalAlignment = Alignment.Bottom,
 						horizontalArrangement = Arrangement.SpaceBetween
 					) {
-						Avatar(user = account!!, big = true)
+						// jank outer border
+						Box(contentAlignment = Alignment.Center) {
+							Box(
+								modifier = Modifier.background(
+									MaterialTheme.colorScheme.background,
+									RoundedCornerShape((bigAvatarRadius + 2).dp)
+								).height((bigAvatarSize + 6).dp)
+									.width((bigAvatarSize + 6).dp)
+							)
+							Avatar(user = account!!, big = true)
+						}
 
 						if (isMe) {
 							OutlinedButton(onClick = {}) {
