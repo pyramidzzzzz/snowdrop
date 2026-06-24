@@ -37,6 +37,7 @@ import site.remlit.snowdrop.model.Status
 import site.remlit.snowdrop.model.User
 import site.remlit.snowdrop.util.LocalNavController
 import site.remlit.snowdrop.util.getCurrentAccountObjectFlow
+import site.remlit.snowdrop.util.toRelativeString
 import snowdrop.shared.generated.resources.Res
 import snowdrop.shared.generated.resources.icon_add_24px
 import snowdrop.shared.generated.resources.icon_bookmark_24px
@@ -44,7 +45,11 @@ import snowdrop.shared.generated.resources.icon_bookmark_filled_24px
 import snowdrop.shared.generated.resources.icon_delete_24px
 import snowdrop.shared.generated.resources.icon_edit_24px
 import snowdrop.shared.generated.resources.icon_flag_24px
+import snowdrop.shared.generated.resources.icon_globe_20px
+import snowdrop.shared.generated.resources.icon_home_20px
 import snowdrop.shared.generated.resources.icon_link_24px
+import snowdrop.shared.generated.resources.icon_lock_20px
+import snowdrop.shared.generated.resources.icon_mail_20px
 import snowdrop.shared.generated.resources.icon_more_horiz_24px
 import snowdrop.shared.generated.resources.icon_open_in_new_24px
 import snowdrop.shared.generated.resources.icon_repeat_24px
@@ -117,16 +122,23 @@ fun Status(status: Status) {
 		// Header
 		Row(
 			modifier = Modifier.padding(10.dp)
-				.clickable(onClick = {
-					navHandler.navigate(Profile(realStatus.account.id))
-				}),
+				.fillMaxWidth(),
 			verticalAlignment = Alignment.CenterVertically
 		) {
-			Column(modifier = Modifier.padding(end = 10.dp)) {
+			Column(
+				modifier = Modifier.padding(end = 10.dp)
+					.clickable(onClick = {
+						navHandler.navigate(Profile(realStatus.account.id))
+					})
+			) {
 				Avatar(realStatus.account)
 			}
 
-			Column {
+			Column(
+				modifier = Modifier.clickable(onClick = {
+					navHandler.navigate(Profile(realStatus.account.id))
+				})
+			) {
 				Text(
 					realStatus.account.displayName ?: realStatus.account.username,
 					fontWeight = FontWeight.Medium,
@@ -135,8 +147,22 @@ fun Status(status: Status) {
 			}
 
 			// todo: visiblity, timestamp, etc.
-			Column {
+			Column(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalAlignment = Alignment.End
+			) {
+				Column(
+					horizontalAlignment = Alignment.CenterHorizontally
+				) {
+					when (realStatus.visibility) {
+						"public" -> Icon(painterResource(Res.drawable.icon_globe_20px) ,null)
+						"unlisted" -> Icon(painterResource(Res.drawable.icon_home_20px) ,null)
+						"private" -> Icon(painterResource(Res.drawable.icon_lock_20px) ,null)
+						"direct" -> Icon(painterResource(Res.drawable.icon_mail_20px) ,null)
+					}
 
+					Text("${realStatus.getCreatedAtTimestamp()?.toRelativeString()}")
+				}
 			}
 		}
 

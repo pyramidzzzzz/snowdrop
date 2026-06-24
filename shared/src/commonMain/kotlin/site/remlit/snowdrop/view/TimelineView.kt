@@ -3,6 +3,7 @@ package site.remlit.snowdrop.view
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -45,8 +46,6 @@ fun TimelineView() = ViewSurface {
 			timeline.addAll(res.response)
 		}
 
-		val scrollState = rememberScrollState()
-
 		TopAppBar(
 			title = {
 				Text("Timeline")
@@ -58,13 +57,14 @@ fun TimelineView() = ViewSurface {
 			}
 		)
 
-		Column(
+		LazyColumn(
 			modifier = Modifier
-				.verticalScroll(scrollState)
 				.fillMaxSize()
 		) {
 			for (status in timeline) {
-				Status(status)
+				item {
+					Status(status)
+				}
 			}
 		}
 	}

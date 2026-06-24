@@ -2,6 +2,8 @@ package site.remlit.snowdrop.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import site.remlit.snowdrop.util.safeReturnable
+import kotlin.time.Instant
 
 @Serializable
 data class Status(
@@ -199,4 +201,9 @@ data class Status(
 		val name: String,
 		val url: String
 	)
+
+	// Instants
+	fun getCreatedAtTimestamp(): Instant? = safeReturnable {
+		Instant.parse(this.createdAt)
+	}
 }

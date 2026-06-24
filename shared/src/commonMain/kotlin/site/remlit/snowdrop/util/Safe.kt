@@ -18,8 +18,8 @@ inline fun <T> safeApiRequest(block: () -> T): ApiResponse<T> =
 		return ApiResponse(error = true, message = e.message)
 	}
 
-inline fun <T> safeReturnable(block: () -> Unit): T? =
-	try { return block() as? T } catch (e: Throwable) {
+inline fun <T> safeReturnable(block: () -> T): T? =
+	try { return block() } catch (e: Throwable) {
 		Logger.e { "Safely caught exception: ${e.message}" }
 		e.printStackTrace()
 		return null
