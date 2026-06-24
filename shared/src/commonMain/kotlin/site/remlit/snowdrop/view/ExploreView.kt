@@ -9,9 +9,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import site.remlit.snowdrop.component.ViewSurface
 
 @Composable
-fun ExploreView() {
+fun ExploreView() = ViewSurface {
 	TopAppBar(
 		title = {
 			Text("Explore")

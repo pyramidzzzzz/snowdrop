@@ -1,5 +1,11 @@
 package site.remlit.snowdrop
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOut
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -29,10 +35,8 @@ import io.kamel.image.asyncPainterResource
 import io.kamel.image.config.LocalKamelConfig
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.painterResource
-import site.remlit.snowdrop.model.User
 import site.remlit.snowdrop.model.ui.Destination
 import site.remlit.snowdrop.util.atRoute
-import site.remlit.snowdrop.util.blockingSettings
 import site.remlit.snowdrop.util.getCurrentAccountObjectFlow
 import site.remlit.snowdrop.util.kamelConfig
 import site.remlit.snowdrop.util.safe
@@ -155,7 +159,11 @@ fun App() = safe {
 			) {
 				NavHost(
 					navController = navController,
-					startDestination = Start
+					startDestination = Start,
+					enterTransition = { EnterTransition.None },
+					exitTransition = { ExitTransition.None },
+					popEnterTransition = { EnterTransition.None },
+					popExitTransition = { ExitTransition.None }
 				) {
 					composable<Start> {
 						StartView(

@@ -16,11 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import site.remlit.snowdrop.api.timeline.getHomeTimeline
 import site.remlit.snowdrop.component.Status
+import site.remlit.snowdrop.component.ViewSurface
 import site.remlit.snowdrop.model.Status
 
 @Composable
 @Preview
-fun TimelineView() {
+fun TimelineView() = ViewSurface {
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		verticalArrangement = Arrangement.Center
@@ -39,6 +40,9 @@ fun TimelineView() {
 		TopAppBar(
 			title = {
 				Text("Timeline")
+			},
+			actions = {
+
 			}
 		)
 

@@ -10,10 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import site.remlit.snowdrop.component.ViewSurface
 
 @Composable
 @Preview
-fun NotificationsView() {
+fun NotificationsView() = ViewSurface {
 	TopAppBar(
 		title = {
 			Text("Notifications")

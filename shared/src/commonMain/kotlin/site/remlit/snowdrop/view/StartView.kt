@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.russhwolf.settings.ExperimentalSettingsApi
+import site.remlit.snowdrop.component.ViewSurface
 import site.remlit.snowdrop.util.settings
 
 @Composable
@@ -18,7 +19,7 @@ import site.remlit.snowdrop.util.settings
 fun StartView(
 	navigateToLogin: () -> Unit,
 	navigateToTimeline: () -> Unit
-) {
+) = ViewSurface {
 	val loggedIn by settings.getBooleanOrNullFlow("logged_in")
 		.collectAsStateWithLifecycle(null)
 

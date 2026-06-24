@@ -33,6 +33,7 @@ import site.remlit.snowdrop.api.oauth.authScopes
 import site.remlit.snowdrop.api.oauth.createApp
 import site.remlit.snowdrop.api.oauth.createToken
 import site.remlit.snowdrop.api.oauth.redirectUri
+import site.remlit.snowdrop.component.ViewSurface
 import site.remlit.snowdrop.model.response.CreateAppResponse
 import site.remlit.snowdrop.model.response.OauthToken
 import site.remlit.snowdrop.util.blockingSettings
@@ -45,7 +46,7 @@ import kotlin.uuid.Uuid
 @OptIn(ExperimentalSettingsApi::class)
 fun LoginView(
 	navigateToTimeline: () -> Unit
-) {
+) = ViewSurface {
 	val uriHandler = LocalUriHandler.current
 
 

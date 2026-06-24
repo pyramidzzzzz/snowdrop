@@ -38,6 +38,7 @@ import io.kamel.image.asyncPainterResource
 import kotlinx.coroutines.Dispatchers
 import site.remlit.snowdrop.api.accounts.getAccount
 import site.remlit.snowdrop.component.Avatar
+import site.remlit.snowdrop.component.ViewSurface
 import site.remlit.snowdrop.component.bigAvatarRadius
 import site.remlit.snowdrop.component.bigAvatarSize
 import site.remlit.snowdrop.model.User
@@ -47,7 +48,7 @@ import site.remlit.snowdrop.util.getCurrentAccountObjectFlow
 const val headerHeight = 200
 
 @Composable
-fun ProfileView(id: String) {
+fun ProfileView(id: String) = ViewSurface {
 	val currentAccount by getCurrentAccountObjectFlow().collectAsStateWithLifecycle(null)
 
 	var account by remember { mutableStateOf<User?>(null) }
