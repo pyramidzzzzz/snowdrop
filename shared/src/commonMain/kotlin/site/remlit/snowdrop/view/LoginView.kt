@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -23,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
@@ -69,6 +72,50 @@ fun LoginView(
 	val clientId by settings.getStringOrNullFlow("account_${currentAccountId}_client_id")
 		.collectAsStateWithLifecycle(null)
 
+	fun continueButtonPressed() {
+		if (host.isBlank()) {
+			showHostError = true
+			return
+		}
+		// todo: validation
+
+		waitingForNext = true
+
+		// todo: this blocking is annoying
+		runBlocking {
+			val existingAccounts = blockingSettings.getString("accounts", "")
+			val accountId = "_S-${Uuid.random()}"
+			blockingSettings.putString("accounts", "$existingAccounts $accountId")
+			blockingSettings.putString("current_account", accountId)
+			blockingSettings.putString("account_${accountId}_host", host)
+
+			// get link you must visit to get token
+			val res = createApp()
+			if (res.error) return@runBlocking
+			if (res.response !is CreateAppResponse) return@runBlocking
+
+			blockingSettings.putString("account_${accountId}_token", "")
+			blockingSettings.putString("account_${accountId}_client_id", res.response.clientId)
+			blockingSettings.putString("account_${accountId}_client_secret", res.response.clientSecret)
+
+			continued = true
+		}
+	}
+
+	fun finishButtonPressed() {
+		runBlocking {
+			val res = createToken(code)
+			if (res.error) return@runBlocking
+			if (res.response !is OauthToken) return@runBlocking
+
+			blockingSettings.putString("account_${currentAccountId}_token", res.response.accessToken)
+			blockingSettings.putBoolean("logged_in", true)
+
+			updateCurrentAccountObject()
+		}
+
+		navigateToTimeline()
+	}
 
 	if (!continued) {
 
@@ -93,6 +140,8 @@ fun LoginView(
 				host,
 				singleLine = true,
 				onValueChange = { host = it },
+				keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
+				keyboardActions = KeyboardActions(onGo = { continueButtonPressed() }),
 				label = { Text("Instance Host") },
 				placeholder = { Text("mastodon.social") }
 			)
@@ -118,35 +167,7 @@ fun LoginView(
 			Button(
 				modifier = Modifier
 					.padding(top = 10.dp),
-				onClick = {
-					if (host.isBlank()) {
-						showHostError = true
-						return@Button
-					}
-					// todo: validation
-
-					waitingForNext = true
-
-					// todo: this blocking is annoying
-					runBlocking {
-						val existingAccounts = blockingSettings.getString("accounts", "")
-						val accountId = "_S-${Uuid.random()}"
-						blockingSettings.putString("accounts", "$existingAccounts $accountId")
-						blockingSettings.putString("current_account", accountId)
-						blockingSettings.putString("account_${accountId}_host", host)
-
-						// get link you must visit to get token
-						val res = createApp()
-						if (res.error) return@runBlocking
-						if (res.response !is CreateAppResponse) return@runBlocking
-
-						blockingSettings.putString("account_${accountId}_token", "")
-						blockingSettings.putString("account_${accountId}_client_id", res.response.clientId)
-						blockingSettings.putString("account_${accountId}_client_secret", res.response.clientSecret)
-
-						continued = true
-					}
-				}
+				onClick = { continueButtonPressed() }
 			) {
 				if (waitingForNext) Text("...")
 				else Text("Continue")
@@ -199,27 +220,15 @@ fun LoginView(
 					code,
 					singleLine = true,
 					onValueChange = { code = it },
-					label = { Text("Code") },
-					placeholder = { Text("••••••••••••••••••••••••••••••••••••••••••••••••") },
+					keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
+					keyboardActions = KeyboardActions(onGo = { finishButtonPressed() }),
+					label = { Text("Code") }
 				)
 
 				Button(
 					modifier = Modifier
 						.padding(top = 10.dp),
-					onClick = {
-						runBlocking {
-							val res = createToken(code)
-							if (res.error) return@runBlocking
-							if (res.response !is OauthToken) return@runBlocking
-
-							blockingSettings.putString("account_${currentAccountId}_token", res.response.accessToken)
-							blockingSettings.putBoolean("logged_in", true)
-
-							updateCurrentAccountObject()
-						}
-
-						navigateToTimeline()
-					}
+					onClick = { finishButtonPressed() }
 				) {
 					Text("Finish")
 				}
