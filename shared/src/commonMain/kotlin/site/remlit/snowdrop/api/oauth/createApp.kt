@@ -9,7 +9,7 @@ import site.remlit.snowdrop.util.endOfRequest
 import site.remlit.snowdrop.util.getCurrentAccountHost
 import site.remlit.snowdrop.util.httpClient
 
-const val authScopes = "read:accounts write:statuses"
+const val authScopes = "read write push"
 const val redirectUri = "urn:ietf:wg:oauth:2.0:oob"
 
 @OptIn(ExperimentalSettingsApi::class)
