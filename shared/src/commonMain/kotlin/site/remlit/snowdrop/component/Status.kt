@@ -230,10 +230,10 @@ fun Status(status: Status) {
 						onClick = { }
 					)
 
-					HorizontalDivider()
-
 					// if mine
 					if (isMine) {
+						HorizontalDivider()
+
 						DropdownMenuItem(
 							text = { Text("Edit") },
 							onClick = { }
