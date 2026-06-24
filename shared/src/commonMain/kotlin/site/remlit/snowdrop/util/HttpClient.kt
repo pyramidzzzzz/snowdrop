@@ -10,6 +10,7 @@ import io.ktor.client.statement.request
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import site.remlit.snowdrop.exception.ApiException
 import site.remlit.snowdrop.model.ApiResponse
 
 val json = Json {
@@ -24,18 +25,15 @@ val httpClient = HttpClient {
 	}
 }
 
-suspend inline fun <reified T> endOfRequest(req: HttpResponse): ApiResponse<T> {
-	if (!req.status.isSuccess()) {
-		val error = "${req.status.value} - ${req.request.url}" +
-				"\nBody: ${req.bodyAsText()}"
-		Logger.e { error }
-		return ApiResponse(true, error)
-	}
+suspend inline fun <reified T> endOfRequest(req: HttpResponse): T {
+	if (!req.status.isSuccess())
+		throw ApiException("${req.status.value} - ${req.request.url}" +
+				"\nBody: ${req.bodyAsText()}")
 
-	val res = ApiResponse(response = req.body<T>())
+	val body = req.body<T>()
 	Logger.d {
 		"${req.status.value} - ${req.request.url}" +
-			"\nApiResponse: $res"
+			"\nBody: $body"
 	}
-	return res
+	return body
 }

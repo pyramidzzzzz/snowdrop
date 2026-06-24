@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
 import org.jetbrains.compose.resources.painterResource
 import site.remlit.snowdrop.component.dropdown.DangerDropdownItem
 import site.remlit.snowdrop.model.Status
@@ -116,6 +117,7 @@ fun Status(status: Status) {
 				Text("@${realStatus.account.fqn}")
 			}
 
+			// todo: visiblity, timestamp, etc.
 			Column {
 
 			}
@@ -123,8 +125,10 @@ fun Status(status: Status) {
 
 		// Content
 		Column(modifier = Modifier.padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)) {
-			if (realStatus.text != null) {
-				Text(realStatus.text!!)
+			if (realStatus.content != null) {
+				Text(text = remember(realStatus.content!!) {
+					htmlToAnnotatedString(realStatus.content!!)
+				})
 			}
 		}
 

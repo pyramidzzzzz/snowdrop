@@ -5,16 +5,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -32,10 +32,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
 import kotlinx.coroutines.Dispatchers
-import org.jetbrains.compose.resources.painterResource
 import site.remlit.snowdrop.api.accounts.getAccount
 import site.remlit.snowdrop.component.Avatar
 import site.remlit.snowdrop.component.bigAvatarRadius
@@ -43,19 +43,18 @@ import site.remlit.snowdrop.component.bigAvatarSize
 import site.remlit.snowdrop.model.User
 import site.remlit.snowdrop.util.formatNumber
 import site.remlit.snowdrop.util.getCurrentAccountObjectFlow
-import snowdrop.shared.generated.resources.Res
-import snowdrop.shared.generated.resources.icon_edit_24px
-import snowdrop.shared.generated.resources.icon_person_add_24px
 
 const val headerHeight = 200
 
 @Composable
-fun Profile(id: String) {
+fun ProfileView(id: String) {
 	val currentAccount by getCurrentAccountObjectFlow().collectAsStateWithLifecycle(null)
 
 	var account by remember { mutableStateOf<User?>(null) }
 	var isMe by remember { mutableStateOf(account?.id == currentAccount?.id) }
 	var ready by remember { mutableStateOf(false) }
+
+	val scrollState = rememberScrollState()
 
 	LaunchedEffect(Dispatchers.Default) {
 		// todo: handle errors
@@ -88,7 +87,10 @@ fun Profile(id: String) {
 			CircularProgressIndicator()
 		}
 	} else {
-		Column {
+		Column(
+			modifier = Modifier
+				.verticalScroll(scrollState)
+		) {
 			Column {
 				@Composable
 				fun fallbackHeader() {
@@ -116,6 +118,7 @@ fun Profile(id: String) {
 					modifier = Modifier.padding(start = 15.dp, end = 15.dp, top = 0.dp, bottom = 10.dp)
 						.offset(y = (-((bigAvatarSize/2))).dp)
 				) {
+					// top of header, avatar and button
 					Row(
 						modifier = Modifier.padding(bottom = 10.dp),
 
@@ -144,7 +147,11 @@ fun Profile(id: String) {
 							}
 						}
 					}
-					Row {
+
+					// display name
+					Row(
+						modifier = Modifier.padding(bottom = 5.dp),
+					) {
 						Column {
 							Text(
 								account!!.displayName ?: account!!.username,
@@ -152,6 +159,34 @@ fun Profile(id: String) {
 								fontSize = 24.sp
 							)
 							Text("@${account!!.fqn}")
+						}
+					}
+
+					// bio
+					if (account!!.note != null) {
+						Text(text = remember(account!!.note!!) {
+							htmlToAnnotatedString(account!!.note!!)
+						})
+					}
+
+					// bottom of header
+					Row(
+						modifier = Modifier.padding(top = 5.dp),
+						horizontalArrangement = Arrangement.spacedBy(10.dp)
+					) {
+						Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+							Text(
+								"${account!!.followersCount}",
+								fontWeight = FontWeight.Bold
+							)
+							Text("followers")
+						}
+						Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+							Text(
+								"${account!!.followingCount}",
+								fontWeight = FontWeight.Bold
+							)
+							Text("following")
 						}
 					}
 				}

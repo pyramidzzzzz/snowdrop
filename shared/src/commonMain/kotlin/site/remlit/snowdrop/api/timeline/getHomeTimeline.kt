@@ -10,6 +10,7 @@ import site.remlit.snowdrop.util.endOfRequest
 import site.remlit.snowdrop.util.getCurrentAccountHost
 import site.remlit.snowdrop.util.getCurrentAccountId
 import site.remlit.snowdrop.util.httpClient
+import site.remlit.snowdrop.util.safeApiRequest
 import site.remlit.snowdrop.util.settings
 
 @OptIn(ExperimentalSettingsApi::class)
@@ -20,7 +21,7 @@ suspend fun getHomeTimeline(
 	sinceId: String? = null,
 	offset: Int? = null,
 	minId: String? = null,
-): ApiResponse<List<Status>> {
+): ApiResponse<List<Status>> = safeApiRequest {
 	val accountId = getCurrentAccountId()
 	val host = getCurrentAccountHost()
 	val token = settings.getString("account_${accountId}_token", "")

@@ -21,6 +21,13 @@ val blockingSettings = settings.toBlockingSettings()
 fun getCurrentAccountId() = blockingSettings.getString("current_account", "")
 fun getCurrentAccountHost() = blockingSettings.getString("account_${getCurrentAccountId()}_host", "")
 
+fun setupAppSettings() {
+	if (!blockingSettings.getBoolean("setup", false)) {
+		blockingSettings.putBoolean("logged_in", false)
+		blockingSettings.putBoolean("setup", true)
+	}
+}
+
 /**
  * Gets the current account's user object from the verify credentials endpoint.
  * @return User
@@ -28,6 +35,9 @@ fun getCurrentAccountHost() = blockingSettings.getString("account_${getCurrentAc
 @OptIn(ExperimentalSettingsApi::class)
 fun getCurrentAccountObjectFlow(): Flow<User> = object : Flow<User> {
 	override suspend fun collect(collector: FlowCollector<User>) {
+		if (getCurrentAccountId() == "")
+			return
+
 		if (settings.getStringOrNull("account_${getCurrentAccountId()}_user") == null)
 			updateCurrentAccountObject()
 

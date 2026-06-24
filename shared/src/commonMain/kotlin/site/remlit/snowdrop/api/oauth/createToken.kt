@@ -9,10 +9,11 @@ import site.remlit.snowdrop.util.endOfRequest
 import site.remlit.snowdrop.util.getCurrentAccountHost
 import site.remlit.snowdrop.util.getCurrentAccountId
 import site.remlit.snowdrop.util.httpClient
+import site.remlit.snowdrop.util.safeApiRequest
 import site.remlit.snowdrop.util.settings
 
 @OptIn(ExperimentalSettingsApi::class)
-suspend fun createToken(code: String): ApiResponse<OauthToken> {
+suspend fun createToken(code: String): ApiResponse<OauthToken> = safeApiRequest {
 	val accountId = getCurrentAccountId()
 	val host = getCurrentAccountHost()
 	val clientId = settings.getString("account_${accountId}_client_id", "")

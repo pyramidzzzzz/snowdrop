@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -14,7 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
-fun Notifications() {
+fun NotificationsView() {
 	TopAppBar(
 		title = {
 			Text("Notifications")

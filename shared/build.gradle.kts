@@ -55,6 +55,7 @@ kotlin {
 			implementation(libs.compose.uiToolingPreview)
 			implementation(libs.androidx.lifecycle.viewmodelCompose)
 			implementation(libs.androidx.lifecycle.runtimeCompose)
+			implementation(libs.androidx.navigation.compose)
 
 			implementation(libs.multiplatform.settings)
 			implementation(libs.multiplatform.settings.coroutines)
@@ -63,9 +64,11 @@ kotlin {
 
 			implementation(libs.ktor.client.core)
 			implementation(libs.kotlinx.coroutines.core)
+			implementation(libs.kotlinx.serialization.json)
 
 			implementation(libs.kermit)
 			implementation(libs.kamel.image.default)
+			implementation(libs.htmlconverter)
 		}
 		commonTest.dependencies {
 			implementation(libs.kotlin.test)
