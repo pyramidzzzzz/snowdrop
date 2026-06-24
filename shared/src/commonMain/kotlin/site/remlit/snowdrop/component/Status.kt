@@ -1,5 +1,6 @@
 package site.remlit.snowdrop.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,9 +26,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
 import org.jetbrains.compose.resources.painterResource
+import site.remlit.snowdrop.Profile
 import site.remlit.snowdrop.component.dropdown.DangerDropdownItem
 import site.remlit.snowdrop.model.Status
 import site.remlit.snowdrop.model.User
+import site.remlit.snowdrop.util.LocalNavController
 import site.remlit.snowdrop.util.getCurrentAccountObjectFlow
 import snowdrop.shared.generated.resources.Res
 import snowdrop.shared.generated.resources.icon_add_24px
@@ -48,6 +51,8 @@ import snowdrop.shared.generated.resources.icon_volume_off_24px
 
 @Composable
 fun Status(status: Status) {
+	val navHandler = LocalNavController.current
+
 	val currentAccount by getCurrentAccountObjectFlow().collectAsStateWithLifecycle(null)
 
 	var realStatus by remember { mutableStateOf(status) }
@@ -84,6 +89,7 @@ fun Status(status: Status) {
 	Column(
 		modifier = Modifier.fillMaxWidth()
 			.padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp)
+		// todo: not vertically centered correctly
 	) {
 		if (isReblog && rebloggingAccount != null) {
 			Row(modifier = Modifier.padding(start = 35.dp)) {
@@ -102,7 +108,10 @@ fun Status(status: Status) {
 
 		// Header
 		Row(
-			modifier = Modifier.padding(10.dp),
+			modifier = Modifier.padding(10.dp)
+				.clickable(onClick = {
+					navHandler.navigate(Profile(realStatus.account.id))
+				}),
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			Column(modifier = Modifier.padding(end = 10.dp)) {

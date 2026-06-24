@@ -71,7 +71,13 @@ fun ProfileView(id: String) = ViewSurface {
 	Column {
 		TopAppBar(
 			title = {
-				if (account == null) Text("Profile")
+				if (account == null) Column {
+					Text("Profile")
+					Text(
+						"0 posts",
+						fontSize = 14.sp
+					)
+				}
 				else Column {
 					Text(
 						account!!.displayName ?: account!!.username,
