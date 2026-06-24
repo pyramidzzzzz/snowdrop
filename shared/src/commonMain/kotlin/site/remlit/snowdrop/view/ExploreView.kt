@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import site.remlit.snowdrop.component.ViewSurface
+import site.remlit.snowdrop.util.toFormatShort
 
 @Composable
 fun ExploreView() = ViewSurface {

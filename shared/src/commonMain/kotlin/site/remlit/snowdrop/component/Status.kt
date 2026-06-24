@@ -37,6 +37,7 @@ import site.remlit.snowdrop.model.Status
 import site.remlit.snowdrop.model.User
 import site.remlit.snowdrop.util.LocalNavController
 import site.remlit.snowdrop.util.getCurrentAccountObjectFlow
+import site.remlit.snowdrop.util.toFormatShort
 import site.remlit.snowdrop.util.toRelativeString
 import snowdrop.shared.generated.resources.Res
 import snowdrop.shared.generated.resources.icon_add_24px
@@ -198,7 +199,7 @@ fun Status(status: Status) {
 					null
 				)
 
-				Text("${realStatus.repliesCount}")
+				Text(realStatus.repliesCount.toFormatShort())
 			}
 
 			FooterButton(onClick = { }) {
@@ -211,7 +212,7 @@ fun Status(status: Status) {
 					null
 				)
 
-				Text("${realStatus.reblogsCount}")
+				Text(realStatus.reblogsCount.toFormatShort())
 			}
 
 			FooterButton(onClick = { }) {
@@ -224,7 +225,7 @@ fun Status(status: Status) {
 					null
 				)
 
-				Text("${realStatus.favouritesCount}")
+				Text(realStatus.favouritesCount.toFormatShort())
 			}
 
 			FooterButton(onClick = { }) {

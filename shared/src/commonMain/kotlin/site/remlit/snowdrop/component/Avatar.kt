@@ -39,7 +39,7 @@ fun Avatar(user: User, big: Boolean = false) {
 	if (user.avatar != null) {
 		KamelImage(
 			{ asyncPainterResource(user.avatarStatic!!) },
-			"Profile",
+			user.avatarDescription,
 			onLoading = { fallback() },
 			modifier = Modifier.clip(RoundedCornerShape(radius))
 				.height(size)
