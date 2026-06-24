@@ -2,10 +2,6 @@ package site.remlit.snowdrop
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.slideIn
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOut
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,7 +20,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -49,6 +44,7 @@ import site.remlit.snowdrop.view.LoginView
 import site.remlit.snowdrop.view.NotificationsView
 import site.remlit.snowdrop.view.ProfileView
 import site.remlit.snowdrop.view.StartView
+import site.remlit.snowdrop.view.StatusView
 import site.remlit.snowdrop.view.TimelineView
 import site.remlit.snowdrop.view.settings.SettingsView
 import snowdrop.shared.generated.resources.Res
@@ -63,19 +59,21 @@ import snowdrop.shared.generated.resources.icon_notifications_filled_24px
 
 
 @Serializable
-object Start : Destination(0)
+object StartRoute : Destination(0)
 @Serializable
-object Login : Destination(1)
+object LoginRoute : Destination(1)
 @Serializable
-object Timeline : Destination(2)
+object TimelineRoute : Destination(2)
 @Serializable
-object Notifications : Destination(3)
+object NotificationsRoute : Destination(3)
 @Serializable
-object Explore : Destination(4)
+object ExploreRoute : Destination(4)
 @Serializable
-object MyProfile : Destination(5)
+object MyProfileRoute : Destination(5)
 @Serializable
-data class Profile(val id: String) : Destination(6)
+data class ProfileRoute(val id: String) : Destination(6)
+@Serializable
+data class StatusRoute(val id: String) : Destination(7)
 
 @Serializable
 object Settings : Destination(100)
@@ -100,12 +98,12 @@ fun App() = safe {
 
 
 	fun shouldHideBottomBar(): Boolean {
-		return atRoute<Profile>(currentDest) || atRoute<Settings>(currentDest)
+		return atRoute<ProfileRoute>(currentDest) || atRoute<Settings>(currentDest)
 	}
 
 	@Composable
 	fun fallbackAvatarIcon() {
-		if (currentDest != null && currentDest.hasRoute<MyProfile>()) Icon(painterResource(Res.drawable.icon_account_circle_filled_24px), null)
+		if (currentDest != null && currentDest.hasRoute<MyProfileRoute>()) Icon(painterResource(Res.drawable.icon_account_circle_filled_24px), null)
 		else Icon(painterResource(Res.drawable.icon_account_circle_24px), null)
 	}
 
@@ -117,38 +115,38 @@ fun App() = safe {
 					if (loggedIn == true && !shouldHideBottomBar()) {
 						NavigationBar {
 							NavigationBarItem(
-								selected = atRoute<Timeline>(currentDest),
-								onClick = { navController.navigate(Timeline) },
+								selected = atRoute<TimelineRoute>(currentDest),
+								onClick = { navController.navigate(TimelineRoute) },
 								icon = {
-									if (atRoute<Timeline>(currentDest)) Icon(painterResource(Res.drawable.icon_home_filled_24px), null)
+									if (atRoute<TimelineRoute>(currentDest)) Icon(painterResource(Res.drawable.icon_home_filled_24px), null)
 									else Icon(painterResource(Res.drawable.icon_home_24px), null)
 								},
 								label = { Text("Timeline") }
 							)
 
 							NavigationBarItem(
-								selected = atRoute<Notifications>(currentDest),
-								onClick = { navController.navigate(Notifications) },
+								selected = atRoute<NotificationsRoute>(currentDest),
+								onClick = { navController.navigate(NotificationsRoute) },
 								icon = {
-									if (atRoute<Notifications>(currentDest)) Icon(painterResource(Res.drawable.icon_notifications_filled_24px), null)
+									if (atRoute<NotificationsRoute>(currentDest)) Icon(painterResource(Res.drawable.icon_notifications_filled_24px), null)
 									else Icon(painterResource(Res.drawable.icon_notifications_24px), null)
 								},
 								label = { Text("Notifications") }
 							)
 
 							NavigationBarItem(
-								selected = atRoute<Explore>(currentDest),
-								onClick = { navController.navigate(Explore) },
+								selected = atRoute<ExploreRoute>(currentDest),
+								onClick = { navController.navigate(ExploreRoute) },
 								icon = {
-									if (atRoute<Explore>(currentDest)) Icon(painterResource(Res.drawable.icon_explore_filled_24px), null)
+									if (atRoute<ExploreRoute>(currentDest)) Icon(painterResource(Res.drawable.icon_explore_filled_24px), null)
 									else Icon(painterResource(Res.drawable.icon_explore_24px), null)
 								},
 								label = { Text("Explore") }
 							)
 
 							NavigationBarItem(
-								selected = atRoute<MyProfile>(currentDest),
-								onClick = { navController.navigate(MyProfile) },
+								selected = atRoute<MyProfileRoute>(currentDest),
+								onClick = { navController.navigate(MyProfileRoute) },
 								icon = {
 									if (account != null && account!!.avatarStatic != null) {
 										KamelImage(
@@ -172,34 +170,38 @@ fun App() = safe {
 				) {
 					NavHost(
 						navController = navController,
-						startDestination = Start,
+						startDestination = StartRoute,
 						enterTransition = { EnterTransition.None },
 						exitTransition = { ExitTransition.None },
 						popEnterTransition = { EnterTransition.None },
 						popExitTransition = { ExitTransition.None }
 					) {
-						composable<Start> {
+						composable<StartRoute> {
 							StartView(
-								navigateToLogin = { navController.navigate(Login) },
-								navigateToTimeline = { navController.navigate(Timeline) },
+								navigateToLogin = { navController.navigate(LoginRoute) },
+								navigateToTimeline = { navController.navigate(TimelineRoute) },
 							)
 						}
 
-						composable<Login> {
+						composable<LoginRoute> {
 							LoginView(
-								navigateToTimeline = { navController.navigate(Timeline) },
+								navigateToTimeline = { navController.navigate(TimelineRoute) },
 							)
 						}
-						composable<Timeline> { TimelineView() }
-						composable<Notifications> { NotificationsView() }
-						composable<Explore> { ExploreView() }
-						composable<MyProfile> {
+						composable<TimelineRoute> { TimelineView() }
+						composable<NotificationsRoute> { NotificationsView() }
+						composable<ExploreRoute> { ExploreView() }
+						composable<MyProfileRoute> {
 							if (account != null) ProfileView(account!!.id)
 							else Text("Error")
 						}
 
-						composable<Profile> {
-							val args = it.toRoute<Profile>()
+						composable<StatusRoute> {
+							val args = it.toRoute<StatusRoute>()
+							StatusView(args.id)
+						}
+						composable<ProfileRoute> {
+							val args = it.toRoute<ProfileRoute>()
 							ProfileView(args.id)
 						}
 

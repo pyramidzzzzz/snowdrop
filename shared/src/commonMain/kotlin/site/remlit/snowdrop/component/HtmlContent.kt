@@ -7,8 +7,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.LinkInteractionListener
 import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
-import co.touchlab.kermit.Logger
-import site.remlit.snowdrop.Profile
+import site.remlit.snowdrop.ProfileRoute
 import site.remlit.snowdrop.model.Status
 import site.remlit.snowdrop.util.LocalNavController
 
@@ -24,7 +23,7 @@ fun HtmlContent(
 		if (link is LinkAnnotation.Url) {
 			val mention = mentions.firstOrNull { m -> m.url == link.url }
 
-			if (mention != null) navHandler.navigate(Profile(mention.id))
+			if (mention != null) navHandler.navigate(ProfileRoute(mention.id))
 			else uriHandler.openUri(link.url)
 		}
 	}

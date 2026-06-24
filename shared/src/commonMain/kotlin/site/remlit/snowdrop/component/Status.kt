@@ -21,17 +21,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ClipEntry
-import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
 import org.jetbrains.compose.resources.painterResource
-import site.remlit.snowdrop.Profile
+import site.remlit.snowdrop.ProfileRoute
+import site.remlit.snowdrop.StatusRoute
 import site.remlit.snowdrop.component.dropdown.DangerDropdownItem
 import site.remlit.snowdrop.model.Status
 import site.remlit.snowdrop.model.User
@@ -50,6 +48,7 @@ import snowdrop.shared.generated.resources.icon_globe_20px
 import snowdrop.shared.generated.resources.icon_home_20px
 import snowdrop.shared.generated.resources.icon_link_24px
 import snowdrop.shared.generated.resources.icon_lock_20px
+import snowdrop.shared.generated.resources.icon_lock_24px
 import snowdrop.shared.generated.resources.icon_mail_20px
 import snowdrop.shared.generated.resources.icon_more_horiz_24px
 import snowdrop.shared.generated.resources.icon_open_in_new_24px
@@ -103,6 +102,9 @@ fun Status(status: Status) {
 	Column(
 		modifier = Modifier.fillMaxWidth()
 			.padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp)
+			.clickable(onClick = {
+				navHandler.navigate(StatusRoute(realStatus.id))
+			})
 		// todo: not vertically centered correctly
 	) {
 		if (isReblog && rebloggingAccount != null) {
@@ -132,7 +134,7 @@ fun Status(status: Status) {
 			Column(
 				modifier = Modifier.padding(end = 10.dp)
 					.clickable(onClick = {
-						navHandler.navigate(Profile(realStatus.account.id))
+						navHandler.navigate(ProfileRoute(realStatus.account.id))
 					})
 			) {
 				Avatar(realStatus.account)
@@ -140,7 +142,7 @@ fun Status(status: Status) {
 
 			Column(
 				modifier = Modifier.clickable(onClick = {
-					navHandler.navigate(Profile(realStatus.account.id))
+					navHandler.navigate(ProfileRoute(realStatus.account.id))
 				})
 			) {
 				Text(
@@ -207,16 +209,24 @@ fun Status(status: Status) {
 			}
 
 			FooterButton(onClick = { }) {
-				if (realStatus.reblogged) Icon(
-					painterResource(Res.drawable.icon_repeat_24px),
-					null,
-					tint = MaterialTheme.colorScheme.primary
-				) else Icon(
-					painterResource(Res.drawable.icon_repeat_24px),
-					null
-				)
+				if (isMine || realStatus.visibility == "public" || realStatus.visibility == "unlisted") {
+					if (realStatus.reblogged) Icon(
+						painterResource(Res.drawable.icon_repeat_24px),
+						null,
+						tint = MaterialTheme.colorScheme.primary
+					) else Icon(
+						painterResource(Res.drawable.icon_repeat_24px),
+						null
+					)
 
-				Text(realStatus.reblogsCount.toFormatShort())
+					Text(realStatus.reblogsCount.toFormatShort())
+				} else {
+					Icon(
+						painterResource(Res.drawable.icon_lock_24px),
+						null,
+						tint = MaterialTheme.colorScheme.secondary
+					)
+				}
 			}
 
 			FooterButton(onClick = { }) {
