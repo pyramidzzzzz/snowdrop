@@ -12,13 +12,15 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import site.remlit.snowdrop.model.ApiResponse
 
+val json = Json {
+	prettyPrint = true
+	isLenient = true
+	ignoreUnknownKeys = true
+}
+
 val httpClient = HttpClient {
 	install(ContentNegotiation) {
-		json(Json {
-			prettyPrint = true
-			isLenient = true
-			ignoreUnknownKeys = true
-		})
+		json(json)
 	}
 }
 

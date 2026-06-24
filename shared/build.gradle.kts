@@ -65,6 +65,7 @@ kotlin {
 			implementation(libs.kotlinx.coroutines.core)
 
 			implementation(libs.kermit)
+			implementation(libs.kamel.image.default)
 		}
 		commonTest.dependencies {
 			implementation(libs.kotlin.test)

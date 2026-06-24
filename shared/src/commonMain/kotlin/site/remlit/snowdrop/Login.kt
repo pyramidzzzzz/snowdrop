@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.LoadingIndicator
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -37,6 +37,7 @@ import site.remlit.snowdrop.model.response.CreateAppResponse
 import site.remlit.snowdrop.model.response.OauthToken
 import site.remlit.snowdrop.util.blockingSettings
 import site.remlit.snowdrop.util.settings
+import site.remlit.snowdrop.util.updateCurrentAccountObject
 import kotlin.uuid.Uuid
 
 @Composable
@@ -141,7 +142,7 @@ fun Login() {
 						}
 					}
 				) {
-					if (waitingForNext) LoadingIndicator()
+					if (waitingForNext) CircularProgressIndicator()
 					else Text("Continue")
 				}
 
@@ -203,6 +204,8 @@ fun Login() {
 
 								blockingSettings.putString("account_${currentAccountId}_token", res.response.accessToken)
 								blockingSettings.putBoolean("logged_in", true)
+
+								updateCurrentAccountObject()
 							}
 						}
 					) {

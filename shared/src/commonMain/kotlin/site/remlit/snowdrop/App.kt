@@ -1,9 +1,10 @@
 package site.remlit.snowdrop
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
 import com.russhwolf.settings.ExperimentalSettingsApi
+import io.kamel.image.config.LocalKamelConfig
+import site.remlit.snowdrop.util.kamelConfig
 import site.remlit.snowdrop.util.settings
 import site.remlit.snowdrop.util.settingsContext
 
@@ -11,11 +12,12 @@ import site.remlit.snowdrop.util.settingsContext
 @Preview
 @OptIn(ExperimentalSettingsApi::class)
 fun App() {
-	val loggedIn by settings.getBooleanFlow("logged_in", false)
-		.collectAsState(false, settingsContext)
+	CompositionLocalProvider(LocalKamelConfig provides kamelConfig) {
 
-	LaunchedEffect(Unit) {}
+		val loggedIn by settings.getBooleanFlow("logged_in", false)
+			.collectAsState(false, settingsContext)
 
-	if (!loggedIn) Login()
-	else LoggedIn()
+		if (!loggedIn) Login()
+		else LoggedIn()
+	}
 }

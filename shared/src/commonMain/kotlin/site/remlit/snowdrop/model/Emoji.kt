@@ -10,6 +10,6 @@ data class Emoji(
 	val staticUrl: String,
 	val url: String,
 	@SerialName("visible_in_picker")
-	val visibleInPicker: Boolean,
-	val category: String
+	val visibleInPicker: Boolean = true,
+	val category: String? = null
 )
