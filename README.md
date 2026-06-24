@@ -1,3 +1,7 @@
 # Snowdrop
 
-awesome garbage
+An attempt to make a Mastodon client that is multiplatform (iOS and Android)
+and supports extensions brought by Mastodon API compatible software
+like Iceshrimp.NET.
+
+Uses Material 3 for UI and icons.
