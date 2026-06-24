@@ -21,8 +21,8 @@ data class Status(
 	@SerialName("in_reply_to_account_id")
 	val inReplyToAccountId: String? = null,
 
-	val reblog: String? = null,
-	val quote: String? = null,
+	val reblog: Status? = null,
+	val quote: Status? = null,
 	@SerialName("quote_id")
 	val quoteId: String? = null,
 	@SerialName("quote_approval")
@@ -51,7 +51,7 @@ data class Status(
 	val visibility: String,
 
 	val poll: Poll? = null,
-	val filtered: List<Filtered> = listOf(),
+	val filtered: List<Filtered>? = null,
 	val mentions: List<Mention> = listOf(),
 	@SerialName("media_attachments")
 	val mediaAttachments: List<MediaAttachment> = listOf(),
@@ -162,14 +162,14 @@ data class Status(
 		@SerialName("text_url")
 		val textUrl: String,
 
-		val meta: Meta,
-		val description: String,
-		val blurhash: String,
+		val meta: Meta? = null,
+		val description: String? = null,
+		val blurhash: String? = null,
 		val type: String
 	) {
 		@Serializable
 		data class Meta(
-			val original: Original
+			val original: Original? = null
 		) {
 			@Serializable
 			data class Original(
@@ -186,7 +186,7 @@ data class Status(
 		val count: Long = 0,
 		val me: Boolean = false,
 		val name: String,
-		val url: String,
+		val url: String? = null,
 		@SerialName("static_url")
 		val staticUrl: String? = null,
 		val accounts: List<User> = emptyList(),
