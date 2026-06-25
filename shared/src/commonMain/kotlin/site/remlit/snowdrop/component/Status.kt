@@ -168,25 +168,28 @@ fun Status(status: Status) {
 				}
 
 				Column(
-					modifier = Modifier.clickable(onClick = {
-						navHandler.navigate(ProfileRoute(realStatus.account.id))
-					})
+					modifier = Modifier.weight(1f)
+						.clickable(onClick = {
+							navHandler.navigate(ProfileRoute(realStatus.account.id))
+						})
 				) {
 					Text(
 						realStatus.account.displayName ?: realStatus.account.username,
 						fontWeight = FontWeight.Medium,
+						overflow = TextOverflow.Ellipsis,
+						maxLines = 1
 					)
 					Text(
 						"@${realStatus.account.fqn}",
 						overflow = TextOverflow.Ellipsis,
 						color = MaterialTheme.colorScheme.onSurfaceVariant,
-						fontSize = 13.sp
+						fontSize = 13.sp,
+						maxLines = 1
 					)
 				}
 
 				// todo: visiblity, timestamp, etc.
 				Column(
-					modifier = Modifier.fillMaxWidth(),
 					horizontalAlignment = Alignment.End
 				) {
 					Column(

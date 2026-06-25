@@ -47,23 +47,20 @@ fun MiniStatus(status: Status) {
 				Text(
 					status.account.displayName ?: status.account.username,
 					fontWeight = FontWeight.Bold,
-					maxLines = 1
+					maxLines = 1,
+					overflow = TextOverflow.Ellipsis,
+					modifier = Modifier.weight(1f)
 				)
 
 				Row(
-					modifier = Modifier.fillMaxWidth(),
-					horizontalArrangement = Arrangement.End
+					horizontalArrangement = Arrangement.spacedBy(5.dp),
+					verticalAlignment = Alignment.CenterVertically
 				) {
-					Row(
-						verticalAlignment = Alignment.CenterVertically,
-						horizontalArrangement = Arrangement.spacedBy(5.dp)
-					) {
-						Text(
-							"${status.getCreatedAtTimestamp()?.toRelativeString()}",
-							fontSize = 13.sp
-						)
-						Visibility(status.visibility)
-					}
+					Text(
+						"${status.getCreatedAtTimestamp()?.toRelativeString()}",
+						fontSize = 13.sp
+					)
+					Visibility(status.visibility)
 				}
 			}
 
