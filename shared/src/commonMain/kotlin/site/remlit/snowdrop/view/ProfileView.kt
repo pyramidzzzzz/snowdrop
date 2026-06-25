@@ -95,7 +95,7 @@ fun ProfileView(id: String) = ViewSurface {
 
 	/* todo: relationships on profile view
 	* var relationships by remember { mutableStateOf<List<RelationshipResponse>?>(null) }
-	if (!isMe) runBlocking {
+	if (ready && !isMe) runBlocking {
 		val req = getRelationships(listOf(currentAccount!!.id, account!!.id))
 		if (req.error) return@runBlocking
 		if (req.response == null) return@runBlocking
