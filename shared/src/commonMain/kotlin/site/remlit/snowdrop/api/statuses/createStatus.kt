@@ -25,6 +25,6 @@ suspend fun createStatus(req: CreateStatusRequest): ApiResponse<Status> = safeAp
 		header("Content-Type", "application/json")
 		setBody(req)
 	}
-
+ 
 	endOfRequest(req)
 }
