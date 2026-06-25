@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -24,7 +25,9 @@ import site.remlit.snowdrop.util.LocalNavController
 import site.remlit.snowdrop.util.toRelativeString
 import snowdrop.shared.generated.resources.Res
 import snowdrop.shared.generated.resources.icon_add_24px
+import snowdrop.shared.generated.resources.icon_edit_24px
 import snowdrop.shared.generated.resources.icon_repeat_24px
+import snowdrop.shared.generated.resources.icon_poll_24px
 import snowdrop.shared.generated.resources.icon_star_24px
 import snowdrop.shared.generated.resources.icon_tooth_24px
 
@@ -55,6 +58,14 @@ fun Notification(notification: Notification) {
 							painterResource(Res.drawable.icon_repeat_24px), null,
 							tint = MaterialTheme.colorScheme.primary
 						)
+						"update" -> Icon(
+							painterResource(Res.drawable.icon_edit_24px), null,
+							tint = MaterialTheme.colorScheme.primary
+						)
+						"poll" -> Icon(
+							painterResource(Res.drawable.icon_poll_24px), null,
+							tint = MaterialTheme.colorScheme.primary
+						)
 						"bite" -> Icon( // todo: tooth, and test bite notifs
 							painterResource(Res.drawable.icon_tooth_24px), null,
 							tint = MaterialTheme.colorScheme.primary
@@ -74,7 +85,7 @@ fun Notification(notification: Notification) {
 						horizontalArrangement = Arrangement.spacedBy(5.dp)
 					) {
 						when (notification.type) {
-							"favourite", "pleroma:emoji_reaction", "reblog", "bite" -> Text(
+							"favourite", "pleroma:emoji_reaction", "reblog", "update", "poll", "bite" -> Text(
 								notification.account.displayName ?: notification.account.username,
 								fontWeight = FontWeight.Bold,
 								overflow = TextOverflow.Ellipsis,
@@ -98,6 +109,16 @@ fun Notification(notification: Notification) {
 							)
 							"reblog" -> Text(
 								"boosted your post",
+								maxLines = 1,
+								modifier = Modifier.weight(1f)
+							)
+							"update" -> Text(
+								"edited a post",
+								maxLines = 1,
+								modifier = Modifier.weight(1f)
+							)
+							"poll" -> Text(
+								"poll has ended",
 								maxLines = 1,
 								modifier = Modifier.weight(1f)
 							)
