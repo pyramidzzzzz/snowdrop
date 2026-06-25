@@ -124,12 +124,10 @@ fun Status(status: Status) {
 					navHandler.navigate(StatusRoute(realStatus.id))
 				}
 			)
-		// todo: not vertically centered correctly
 	) {
 		Column(
 			modifier = Modifier.fillMaxWidth()
 				.padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp)
-
 			// todo: not vertically centered correctly
 		) {
 			if (isReblog && rebloggingAccount != null) {
@@ -166,7 +164,9 @@ fun Status(status: Status) {
 						}
 			}
 
-			// Header
+			/*
+			* Header
+			*/
 			Row(
 				modifier = Modifier.padding(5.dp)
 					.fillMaxWidth(),
@@ -202,7 +202,6 @@ fun Status(status: Status) {
 					)
 				}
 
-				// todo: visiblity, timestamp, etc.
 				Column(
 					horizontalAlignment = Alignment.End
 				) {
@@ -296,7 +295,9 @@ fun Status(status: Status) {
 				MiniStatus(realStatus.quotedStatus!!)
 			}
 
-			// Footer
+			/*
+			* Footer
+			*/
 			Row(
 				modifier = Modifier.padding(start = 5.dp, end = 5.dp),
 				horizontalArrangement = Arrangement.spacedBy(5.dp),
