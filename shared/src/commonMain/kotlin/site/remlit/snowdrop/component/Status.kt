@@ -170,13 +170,7 @@ fun Status(status: Status) {
 					Column(
 						horizontalAlignment = Alignment.CenterHorizontally
 					) {
-						when (realStatus.visibility) {
-							"public" -> Icon(painterResource(Res.drawable.icon_globe_20px) ,null)
-							"unlisted" -> Icon(painterResource(Res.drawable.icon_home_20px) ,null)
-							"private" -> Icon(painterResource(Res.drawable.icon_lock_20px) ,null)
-							"direct" -> Icon(painterResource(Res.drawable.icon_mail_20px) ,null)
-						}
-
+						Visibility(status.visibility)
 						Text("${realStatus.getCreatedAtTimestamp()?.toRelativeString()}")
 					}
 				}

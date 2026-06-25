@@ -15,16 +15,21 @@ import io.kamel.image.asyncPainterResource
 import site.remlit.snowdrop.model.User
 
 const val bigAvatarSize = 84
+const val smallAvatarSize = 24
 const val avatarSize = 48
 
 const val bigAvatarRadius = 20
+const val smallAvatarRadius = 8
 const val avatarRadius = 15
 
 @Composable
-fun Avatar(user: User, big: Boolean = false) {
-
-	val size = if (big) bigAvatarSize.dp else avatarSize.dp
-	val radius = if (big) bigAvatarRadius.dp else avatarRadius.dp
+fun Avatar(
+	user: User,
+	big: Boolean = false,
+	small: Boolean = false
+) {
+	val size = if (big) bigAvatarSize.dp else if (small) smallAvatarSize.dp else avatarSize.dp
+	val radius = if (big) bigAvatarRadius.dp else if (small) smallAvatarRadius.dp else avatarRadius.dp
 
 	@Composable
 	fun fallback() {

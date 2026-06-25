@@ -20,6 +20,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -80,7 +82,8 @@ fun ProfileView(id: String) = ViewSurface {
 		ready = true
 	}
 
-	val verticalOffset = (-((bigAvatarSize/2))).dp
+	val verticalOffset = (-((bigAvatarSize/2) - 4)).dp
+	var selectedTab by remember { mutableStateOf(0) }
 
 	Column {
 		TopAppBar(
@@ -232,7 +235,7 @@ fun ProfileView(id: String) = ViewSurface {
 						 */
 
 						Row(
-							modifier = Modifier.padding(top = 5.dp)
+							modifier = Modifier.padding(top = 10.dp)
 						) {
 							Text("Joined at " + account!!.createdAt)
 						}
@@ -262,11 +265,13 @@ fun ProfileView(id: String) = ViewSurface {
 					Column(
 						modifier = Modifier.offset(y = verticalOffset)
 					) {
-						HorizontalDivider(
-							thickness = 1.dp,
-							color = MaterialTheme.colorScheme.surfaceContainer
-						)
+						HorizontalDivider()
 
+						PrimaryTabRow(selectedTabIndex = selectedTab) {
+							Tab(selectedTab == 0, onClick = { selectedTab = 0 }, text = { Text("Posts") })
+							Tab(selectedTab == 1, onClick = { selectedTab = 1 }, text = { Text("Posts & Replies") })
+							Tab(selectedTab == 2, onClick = { selectedTab = 2 }, text = { Text("Media") })
+						}
 
 					}
 					// stay inside this above column ^^^
