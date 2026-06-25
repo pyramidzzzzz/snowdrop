@@ -1,5 +1,7 @@
 package site.remlit.snowdrop.component
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateBounds
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -234,9 +236,11 @@ fun Status(status: Status) {
 						}
 					}
 
-					if (cwOpen) Column(
-						modifier = Modifier.padding(top = 10.dp)
-					) { renderContent() }
+					AnimatedVisibility(cwOpen) {
+						Column(
+							modifier = Modifier.padding(top = 10.dp)
+						) { renderContent() }
+					}
 				} else renderContent()
 
 			}
