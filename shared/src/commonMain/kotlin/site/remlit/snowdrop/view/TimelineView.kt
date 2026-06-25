@@ -6,15 +6,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.PullToRefreshState
-import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,12 +21,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavOptions
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import site.remlit.snowdrop.Settings
-import site.remlit.snowdrop.TimelineRoute
 import site.remlit.snowdrop.api.timeline.getHomeTimeline
 import site.remlit.snowdrop.component.Status
 import site.remlit.snowdrop.component.ViewSurface
@@ -50,9 +43,9 @@ fun TimelineView() = ViewSurface {
 		val coroutineScope = rememberCoroutineScope()
 		val listState = rememberLazyListState()
 
-		var timeline = remember { mutableStateListOf<Status>() }
-		var refreshState = rememberPullToRefreshState()
-		var isRefreshing = remember { mutableStateOf(false) }
+		val timeline = remember { mutableStateListOf<Status>() }
+		val refreshState = rememberPullToRefreshState()
+		val isRefreshing = remember { mutableStateOf(false) }
 
 		suspend fun addOrUpdateTimeline() {
 			isRefreshing.value = true
