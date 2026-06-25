@@ -100,248 +100,252 @@ fun Status(status: Status) {
 
 
 	Column(
-		modifier = Modifier.fillMaxWidth()
-			.padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp)
-			.clickable(onClick = {
-				navHandler.navigate(StatusRoute(realStatus.id))
-			})
-		// todo: not vertically centered correctly
+		modifier = Modifier.clickable(onClick = {
+			navHandler.navigate(StatusRoute(realStatus.id))
+		})
 	) {
-		if (isReblog && rebloggingAccount != null) {
-			Row(
-				modifier = Modifier.padding(start = 35.dp),
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				Icon(
-					painterResource(Res.drawable.icon_repeat_24px),
-					null,
-					modifier = Modifier.padding(end = 5.dp),
-					tint = MaterialTheme.colorScheme.secondary
-				)
-				Text(
-					"${rebloggingAccount!!.displayName ?: rebloggingAccount!!.username} boosted",
-					color = MaterialTheme.colorScheme.secondary
-				)
-			}
-		}
+		Column(
+			modifier = Modifier.fillMaxWidth()
+				.padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp)
 
-		// Header
-		Row(
-			modifier = Modifier.padding(5.dp)
-				.fillMaxWidth(),
-			verticalAlignment = Alignment.CenterVertically
+			// todo: not vertically centered correctly
 		) {
-			Column(
-				modifier = Modifier.padding(end = 10.dp)
-					.clickable(onClick = {
-						navHandler.navigate(ProfileRoute(realStatus.account.id))
-					})
-			) {
-				Avatar(realStatus.account)
-			}
-
-			Column(
-				modifier = Modifier.clickable(onClick = {
-					navHandler.navigate(ProfileRoute(realStatus.account.id))
-				})
-			) {
-				Text(
-					realStatus.account.displayName ?: realStatus.account.username,
-					fontWeight = FontWeight.Medium,
-				)
-				Text("@${realStatus.account.fqn}")
-			}
-
-			// todo: visiblity, timestamp, etc.
-			Column(
-				modifier = Modifier.fillMaxWidth(),
-				horizontalAlignment = Alignment.End
-			) {
-				Column(
-					horizontalAlignment = Alignment.CenterHorizontally
+			if (isReblog && rebloggingAccount != null) {
+				Row(
+					modifier = Modifier.padding(start = 35.dp),
+					verticalAlignment = Alignment.CenterVertically
 				) {
-					when (realStatus.visibility) {
-						"public" -> Icon(painterResource(Res.drawable.icon_globe_20px) ,null)
-						"unlisted" -> Icon(painterResource(Res.drawable.icon_home_20px) ,null)
-						"private" -> Icon(painterResource(Res.drawable.icon_lock_20px) ,null)
-						"direct" -> Icon(painterResource(Res.drawable.icon_mail_20px) ,null)
-					}
-
-					Text("${realStatus.getCreatedAtTimestamp()?.toRelativeString()}")
+					Icon(
+						painterResource(Res.drawable.icon_repeat_24px),
+						null,
+						modifier = Modifier.padding(end = 5.dp),
+						tint = MaterialTheme.colorScheme.secondary
+					)
+					Text(
+						"${rebloggingAccount!!.displayName ?: rebloggingAccount!!.username} boosted",
+						color = MaterialTheme.colorScheme.secondary
+					)
 				}
 			}
-		}
 
-		// Content
-		Column(modifier = Modifier.padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)) {
-			if (realStatus.content != null) {
-				HtmlContent(realStatus.content!!, realStatus.mentions)
-			}
-		}
-
-		if (realStatus.reactions.isEmpty()) {
+			// Header
 			Row(
+				modifier = Modifier.padding(5.dp)
+					.fillMaxWidth(),
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				Column(
+					modifier = Modifier.padding(end = 10.dp)
+						.clickable(onClick = {
+							navHandler.navigate(ProfileRoute(realStatus.account.id))
+						})
+				) {
+					Avatar(realStatus.account)
+				}
+
+				Column(
+					modifier = Modifier.clickable(onClick = {
+						navHandler.navigate(ProfileRoute(realStatus.account.id))
+					})
+				) {
+					Text(
+						realStatus.account.displayName ?: realStatus.account.username,
+						fontWeight = FontWeight.Medium,
+					)
+					Text("@${realStatus.account.fqn}")
+				}
+
+				// todo: visiblity, timestamp, etc.
+				Column(
+					modifier = Modifier.fillMaxWidth(),
+					horizontalAlignment = Alignment.End
+				) {
+					Column(
+						horizontalAlignment = Alignment.CenterHorizontally
+					) {
+						when (realStatus.visibility) {
+							"public" -> Icon(painterResource(Res.drawable.icon_globe_20px) ,null)
+							"unlisted" -> Icon(painterResource(Res.drawable.icon_home_20px) ,null)
+							"private" -> Icon(painterResource(Res.drawable.icon_lock_20px) ,null)
+							"direct" -> Icon(painterResource(Res.drawable.icon_mail_20px) ,null)
+						}
+
+						Text("${realStatus.getCreatedAtTimestamp()?.toRelativeString()}")
+					}
+				}
+			}
+
+			// Content
+			Column(modifier = Modifier.padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)) {
+				if (realStatus.content != null) {
+					HtmlContent(realStatus.content!!, realStatus.mentions)
+				}
+			}
+
+			if (realStatus.reactions.isEmpty()) {
+				Row(
+					horizontalArrangement = Arrangement.spacedBy(5.dp),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					for (reaction in realStatus.reactions) {
+						Text("${reaction.name} ${reaction.count}")
+					}
+				}
+			}
+
+			// Footer
+			Row(
+				modifier = Modifier.padding(start = 5.dp, end = 5.dp),
 				horizontalArrangement = Arrangement.spacedBy(5.dp),
 				verticalAlignment = Alignment.CenterVertically
 			) {
-				for (reaction in realStatus.reactions) {
-					Text("${reaction.name} ${reaction.count}")
+				FooterButton(onClick = { }) {
+					if (realStatus.inReplyToId != null) Icon(
+						painterResource(Res.drawable.icon_reply_all_24px),
+						null
+					) else Icon(
+						painterResource(Res.drawable.icon_reply_24px),
+						null
+					)
+
+					Text(realStatus.repliesCount.toFormatShort())
 				}
-			}
-		}
 
-		// Footer
-		Row(
-			modifier = Modifier.padding(start = 5.dp, end = 5.dp, bottom = 5.dp),
-			horizontalArrangement = Arrangement.spacedBy(5.dp),
-			verticalAlignment = Alignment.CenterVertically
-		) {
-			FooterButton(onClick = { }) {
-				if (realStatus.inReplyToId != null) Icon(
-					painterResource(Res.drawable.icon_reply_all_24px),
-					null
-				) else Icon(
-					painterResource(Res.drawable.icon_reply_24px),
-					null
-				)
+				FooterButton(onClick = { }) {
+					if (isMine || realStatus.visibility == "public" || realStatus.visibility == "unlisted") {
+						if (realStatus.reblogged) Icon(
+							painterResource(Res.drawable.icon_repeat_24px),
+							null,
+							tint = MaterialTheme.colorScheme.primary
+						) else Icon(
+							painterResource(Res.drawable.icon_repeat_24px),
+							null
+						)
 
-				Text(realStatus.repliesCount.toFormatShort())
-			}
+						Text(realStatus.reblogsCount.toFormatShort())
+					} else {
+						Icon(
+							painterResource(Res.drawable.icon_lock_24px),
+							null,
+							tint = MaterialTheme.colorScheme.secondary
+						)
+					}
+				}
 
-			FooterButton(onClick = { }) {
-				if (isMine || realStatus.visibility == "public" || realStatus.visibility == "unlisted") {
-					if (realStatus.reblogged) Icon(
-						painterResource(Res.drawable.icon_repeat_24px),
+				FooterButton(onClick = { }) {
+					if (realStatus.favourited) Icon(
+						painterResource(Res.drawable.icon_star_filled_24px),
 						null,
 						tint = MaterialTheme.colorScheme.primary
 					) else Icon(
-						painterResource(Res.drawable.icon_repeat_24px),
+						painterResource(Res.drawable.icon_star_24px),
 						null
 					)
 
-					Text(realStatus.reblogsCount.toFormatShort())
-				} else {
-					Icon(
-						painterResource(Res.drawable.icon_lock_24px),
+					Text(realStatus.favouritesCount.toFormatShort())
+				}
+
+				FooterButton(onClick = { }) {
+					if (realStatus.favourited) Icon(
+						painterResource(Res.drawable.icon_add_24px),
 						null,
-						tint = MaterialTheme.colorScheme.secondary
-					)
-				}
-			}
-
-			FooterButton(onClick = { }) {
-				if (realStatus.favourited) Icon(
-					painterResource(Res.drawable.icon_star_filled_24px),
-					null,
-					tint = MaterialTheme.colorScheme.primary
-				) else Icon(
-					painterResource(Res.drawable.icon_star_24px),
-					null
-				)
-
-				Text(realStatus.favouritesCount.toFormatShort())
-			}
-
-			FooterButton(onClick = { }) {
-				if (realStatus.favourited) Icon(
-					painterResource(Res.drawable.icon_add_24px),
-					null,
-					tint = MaterialTheme.colorScheme.primary
-				) else Icon(
-					painterResource(Res.drawable.icon_add_24px),
-					null
-				)
-			}
-
-			Box {
-				FooterButton(onClick = { showDropdown = !showDropdown }) {
-					Icon(
-						painterResource(Res.drawable.icon_more_horiz_24px),
+						tint = MaterialTheme.colorScheme.primary
+					) else Icon(
+						painterResource(Res.drawable.icon_add_24px),
 						null
 					)
 				}
 
-				DropdownMenu(
-					expanded = showDropdown,
-					onDismissRequest = { showDropdown = false }
-				) {
-					DropdownMenuItem(
-						text = { Text("Copy link") },
-						leadingIcon = {
-							Icon(painterResource(Res.drawable.icon_link_24px), null)
-						},
-						onClick = {
-							clipboardManager.setText(AnnotatedString(status.url))
-							showDropdown = !showDropdown
-						}
-					)
-
-					DropdownMenuItem(
-						text = { Text("Open in browser") },
-						leadingIcon = {
-							Icon(painterResource(Res.drawable.icon_open_in_new_24px), null)
-						},
-						onClick = {
-							uriHandler.openUri(status.url)
-							showDropdown = !showDropdown
-						}
-					)
-
-					HorizontalDivider()
-
-					if (realStatus.bookmarked) {
-						DropdownMenuItem(
-							text = { Text("Unbookmark") },
-							leadingIcon = {
-								Icon(painterResource(Res.drawable.icon_bookmark_filled_24px), null)
-							},
-							onClick = { }
-						)
-					} else {
-						DropdownMenuItem(
-							text = { Text("Bookmark") },
-							leadingIcon = {
-								Icon(painterResource(Res.drawable.icon_bookmark_24px), null)
-							},
-							onClick = { }
+				Box {
+					FooterButton(onClick = { showDropdown = !showDropdown }) {
+						Icon(
+							painterResource(Res.drawable.icon_more_horiz_24px),
+							null
 						)
 					}
 
-					DropdownMenuItem(
-						text = { Text("Mute") },
-						leadingIcon = {
-							Icon(painterResource(Res.drawable.icon_volume_off_24px), null)
-						},
-						onClick = { }
-					)
-
-					DangerDropdownItem(
-						text = { Text("Report") },
-						leadingIcon = {
-							Icon(painterResource(Res.drawable.icon_flag_24px), null)
-						},
-						onClick = { }
-					)
-
-					// if mine
-					if (isMine) {
-						HorizontalDivider()
+					DropdownMenu(
+						expanded = showDropdown,
+						onDismissRequest = { showDropdown = false }
+					) {
+						DropdownMenuItem(
+							text = { Text("Copy link") },
+							leadingIcon = {
+								Icon(painterResource(Res.drawable.icon_link_24px), null)
+							},
+							onClick = {
+								clipboardManager.setText(AnnotatedString(status.url))
+								showDropdown = !showDropdown
+							}
+						)
 
 						DropdownMenuItem(
-							text = { Text("Edit") },
+							text = { Text("Open in browser") },
 							leadingIcon = {
-								Icon(painterResource(Res.drawable.icon_edit_24px), null)
+								Icon(painterResource(Res.drawable.icon_open_in_new_24px), null)
+							},
+							onClick = {
+								uriHandler.openUri(status.url)
+								showDropdown = !showDropdown
+							}
+						)
+
+						HorizontalDivider()
+
+						if (realStatus.bookmarked) {
+							DropdownMenuItem(
+								text = { Text("Unbookmark") },
+								leadingIcon = {
+									Icon(painterResource(Res.drawable.icon_bookmark_filled_24px), null)
+								},
+								onClick = { }
+							)
+						} else {
+							DropdownMenuItem(
+								text = { Text("Bookmark") },
+								leadingIcon = {
+									Icon(painterResource(Res.drawable.icon_bookmark_24px), null)
+								},
+								onClick = { }
+							)
+						}
+
+						DropdownMenuItem(
+							text = { Text("Mute") },
+							leadingIcon = {
+								Icon(painterResource(Res.drawable.icon_volume_off_24px), null)
 							},
 							onClick = { }
 						)
 
 						DangerDropdownItem(
-							text = { Text("Delete") },
+							text = { Text("Report") },
 							leadingIcon = {
-								Icon(painterResource(Res.drawable.icon_delete_24px), null)
+								Icon(painterResource(Res.drawable.icon_flag_24px), null)
 							},
 							onClick = { }
 						)
+
+						// if mine
+						if (isMine) {
+							HorizontalDivider()
+
+							DropdownMenuItem(
+								text = { Text("Edit") },
+								leadingIcon = {
+									Icon(painterResource(Res.drawable.icon_edit_24px), null)
+								},
+								onClick = { }
+							)
+
+							DangerDropdownItem(
+								text = { Text("Delete") },
+								leadingIcon = {
+									Icon(painterResource(Res.drawable.icon_delete_24px), null)
+								},
+								onClick = { }
+							)
+						}
 					}
 				}
 			}
