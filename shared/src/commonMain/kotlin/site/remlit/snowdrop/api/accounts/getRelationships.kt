@@ -5,7 +5,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import site.remlit.snowdrop.model.ApiResponse
-import site.remlit.snowdrop.model.response.RelationshipResponse
+import site.remlit.snowdrop.model.Relationship
 import site.remlit.snowdrop.util.endOfRequest
 import site.remlit.snowdrop.util.getCurrentAccountHost
 import site.remlit.snowdrop.util.getCurrentAccountId
@@ -15,7 +15,7 @@ import site.remlit.snowdrop.util.settings
 
 
 @OptIn(ExperimentalSettingsApi::class)
-suspend fun getRelationships(ids: List<String>): ApiResponse<List<RelationshipResponse>> = safeApiRequest {
+suspend fun getRelationships(ids: List<String>): ApiResponse<List<Relationship>> = safeApiRequest {
 	val accountId = getCurrentAccountId()
 	val host = getCurrentAccountHost()
 	val token = settings.getString("account_${accountId}_token", "")
