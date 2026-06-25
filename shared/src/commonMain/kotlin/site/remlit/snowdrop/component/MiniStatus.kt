@@ -1,5 +1,6 @@
 package site.remlit.snowdrop.component
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,12 +10,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -35,13 +39,13 @@ import snowdrop.shared.generated.resources.icon_mail_20px
 fun MiniStatus(status: Status) {
 	val navHandler = LocalNavController.current
 
-	Card(
+	Column(
 		modifier = Modifier.fillMaxWidth()
-			.clickable(
-				onClick = {
-					navHandler.navigate(StatusRoute(status.id))
-				}
-			)
+			.clip(RoundedCornerShape(10.dp))
+			.border(1.dp, MaterialTheme.colorScheme.surfaceContainerHigh, RoundedCornerShape(10.dp))
+			.clickable(onClick = {
+				navHandler.navigate(StatusRoute(status.id))
+			})
 	) {
 		Column(modifier = Modifier.padding(10.dp)) {
 			Row(
@@ -69,11 +73,27 @@ fun MiniStatus(status: Status) {
 				}
 			}
 
-			if (status.content != null) {
-				Column(
-					modifier = Modifier.padding(top = 5.dp)
+			if (!status.spoilerText.isNullOrBlank()) {
+				Row(
+					modifier = Modifier.padding(top = 5.dp),
+					horizontalArrangement = Arrangement.spacedBy(5.dp)
 				) {
-					HtmlContent(status.content, status.mentions, maxLines = 3)
+					Text(
+						"CW:",
+						fontWeight = FontWeight.Bold
+					)
+					Text(
+						status.spoilerText,
+						fontWeight = FontWeight.Medium
+					)
+				}
+			} else {
+				if (status.content != null) {
+					Row(
+						modifier = Modifier.padding(top = 5.dp)
+					) {
+						HtmlContent(status.content, status.mentions, maxLines = 3)
+					}
 				}
 			}
 		}

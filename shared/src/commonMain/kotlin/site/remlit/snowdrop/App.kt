@@ -31,6 +31,7 @@ import io.kamel.image.asyncPainterResource
 import io.kamel.image.config.LocalKamelConfig
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.painterResource
+import site.remlit.snowdrop.component.AppTheme
 import site.remlit.snowdrop.model.ui.Destination
 import site.remlit.snowdrop.util.LocalNavController
 import site.remlit.snowdrop.util.atRoute
@@ -103,118 +104,134 @@ fun App() = safe {
 
 	@Composable
 	fun fallbackAvatarIcon() {
-		if (currentDest != null && currentDest.hasRoute<MyProfileRoute>()) Icon(painterResource(Res.drawable.icon_account_circle_filled_24px), null)
+		if (currentDest != null && currentDest.hasRoute<MyProfileRoute>()) Icon(
+			painterResource(Res.drawable.icon_account_circle_filled_24px),
+			null
+		)
 		else Icon(painterResource(Res.drawable.icon_account_circle_24px), null)
 	}
 
-	CompositionLocalProvider(LocalNavController provides navController) {
-		CompositionLocalProvider(LocalKamelConfig provides kamelConfig) {
+	AppTheme {
 
-			Scaffold(
-				bottomBar = {
-					if (loggedIn == true && !shouldHideBottomBar()) {
-						NavigationBar {
-							NavigationBarItem(
-								selected = atRoute<TimelineRoute>(currentDest),
-								onClick = {
+		CompositionLocalProvider(LocalNavController provides navController) {
+			CompositionLocalProvider(LocalKamelConfig provides kamelConfig) {
+
+				Scaffold(
+					bottomBar = {
+						if (loggedIn == true && !shouldHideBottomBar()) {
+							NavigationBar {
+								NavigationBarItem(
+									selected = atRoute<TimelineRoute>(currentDest),
+									onClick = {
 									if (!atRoute<TimelineRoute>(currentDest)) {
 										navController.navigate(TimelineRoute)
 									}
 							  	},
-								icon = {
-									if (atRoute<TimelineRoute>(currentDest)) Icon(painterResource(Res.drawable.icon_home_filled_24px), null)
-									else Icon(painterResource(Res.drawable.icon_home_24px), null)
-								},
-								label = { Text("Timeline") }
-							)
-
-							NavigationBarItem(
-								selected = atRoute<NotificationsRoute>(currentDest),
-								onClick = { navController.navigate(NotificationsRoute) },
-								icon = {
-									if (atRoute<NotificationsRoute>(currentDest)) Icon(painterResource(Res.drawable.icon_notifications_filled_24px), null)
-									else Icon(painterResource(Res.drawable.icon_notifications_24px), null)
-								},
-								label = { Text("Notifications") }
-							)
-
-							NavigationBarItem(
-								selected = atRoute<ExploreRoute>(currentDest),
-								onClick = { navController.navigate(ExploreRoute) },
-								icon = {
-									if (atRoute<ExploreRoute>(currentDest)) Icon(painterResource(Res.drawable.icon_explore_filled_24px), null)
-									else Icon(painterResource(Res.drawable.icon_explore_24px), null)
-								},
-								label = { Text("Explore") }
-							)
-
-							NavigationBarItem(
-								selected = atRoute<MyProfileRoute>(currentDest),
-								onClick = { navController.navigate(MyProfileRoute) },
-								icon = {
-									if (account != null && account!!.avatarStatic != null) {
-										KamelImage(
-											{ asyncPainterResource(account!!.avatarStatic!!) },
-											"Profile",
-											onLoading = { fallbackAvatarIcon() },
-											modifier = Modifier.clip(CircleShape)
-												.height(24.dp)
-												.width(24.dp)
+									icon = {
+										if (atRoute<TimelineRoute>(currentDest)) Icon(
+											painterResource(Res.drawable.icon_home_filled_24px),
+											null
 										)
-									} else fallbackAvatarIcon()
-								},
-								label = { Text("Profile") }
-							)
+										else Icon(painterResource(Res.drawable.icon_home_24px), null)
+									},
+									label = { Text("Timeline") }
+								)
+
+								NavigationBarItem(
+									selected = atRoute<NotificationsRoute>(currentDest),
+									onClick = { navController.navigate(NotificationsRoute) },
+									icon = {
+										if (atRoute<NotificationsRoute>(currentDest)) Icon(
+											painterResource(Res.drawable.icon_notifications_filled_24px),
+											null
+										)
+										else Icon(painterResource(Res.drawable.icon_notifications_24px), null)
+									},
+									label = { Text("Notifications") }
+								)
+
+								NavigationBarItem(
+									selected = atRoute<ExploreRoute>(currentDest),
+									onClick = { navController.navigate(ExploreRoute) },
+									icon = {
+										if (atRoute<ExploreRoute>(currentDest)) Icon(
+											painterResource(Res.drawable.icon_explore_filled_24px),
+											null
+										)
+										else Icon(painterResource(Res.drawable.icon_explore_24px), null)
+									},
+									label = { Text("Explore") }
+								)
+
+								NavigationBarItem(
+									selected = atRoute<MyProfileRoute>(currentDest),
+									onClick = { navController.navigate(MyProfileRoute) },
+									icon = {
+										if (account != null && account!!.avatarStatic != null) {
+											KamelImage(
+												{ asyncPainterResource(account!!.avatarStatic!!) },
+												"Profile",
+												onLoading = { fallbackAvatarIcon() },
+												modifier = Modifier.clip(CircleShape)
+													.height(24.dp)
+													.width(24.dp)
+											)
+										} else fallbackAvatarIcon()
+									},
+									label = { Text("Profile") }
+								)
+							}
 						}
 					}
-				}
-			) { bottomPadding ->
-				Column(
-					modifier = Modifier.padding(bottom = bottomPadding.calculateBottomPadding())
-				) {
-					NavHost(
-						navController = navController,
-						startDestination = StartRoute,
-						enterTransition = { EnterTransition.None },
-						exitTransition = { ExitTransition.None },
-						popEnterTransition = { EnterTransition.None },
-						popExitTransition = { ExitTransition.None }
+				) { bottomPadding ->
+					Column(
+						modifier = Modifier.padding(bottom = bottomPadding.calculateBottomPadding())
 					) {
-						composable<StartRoute> {
-							StartView(
-								navigateToLogin = { navController.navigate(LoginRoute) },
-								navigateToTimeline = { navController.navigate(TimelineRoute) },
-							)
-						}
+						NavHost(
+							navController = navController,
+							startDestination = StartRoute,
+							enterTransition = { EnterTransition.None },
+							exitTransition = { ExitTransition.None },
+							popEnterTransition = { EnterTransition.None },
+							popExitTransition = { ExitTransition.None }
+						) {
+							composable<StartRoute> {
+								StartView(
+									navigateToLogin = { navController.navigate(LoginRoute) },
+									navigateToTimeline = { navController.navigate(TimelineRoute) },
+								)
+							}
 
-						composable<LoginRoute> {
-							LoginView(
-								navigateToTimeline = { navController.navigate(TimelineRoute) },
-							)
-						}
-						composable<TimelineRoute> { TimelineView() }
-						composable<NotificationsRoute> { NotificationsView() }
-						composable<ExploreRoute> { ExploreView() }
-						composable<MyProfileRoute> {
-							if (account != null) ProfileView(account!!.id)
-							else Text("Error")
-						}
+							composable<LoginRoute> {
+								LoginView(
+									navigateToTimeline = { navController.navigate(TimelineRoute) },
+								)
+							}
+							composable<TimelineRoute> { TimelineView() }
+							composable<NotificationsRoute> { NotificationsView() }
+							composable<ExploreRoute> { ExploreView() }
+							composable<MyProfileRoute> {
+								if (account != null) ProfileView(account!!.id)
+								else Text("Error")
+							}
 
-						composable<StatusRoute> {
-							val args = it.toRoute<StatusRoute>()
-							StatusView(args.id)
-						}
-						composable<ProfileRoute> {
-							val args = it.toRoute<ProfileRoute>()
-							ProfileView(args.id)
-						}
+							composable<StatusRoute> {
+								val args = it.toRoute<StatusRoute>()
+								StatusView(args.id)
+							}
+							composable<ProfileRoute> {
+								val args = it.toRoute<ProfileRoute>()
+								ProfileView(args.id)
+							}
 
-						// Settings
-						composable<Settings> { SettingsView() }
+							// Settings
+							composable<Settings> { SettingsView() }
+						}
 					}
 				}
-			}
 
+			}
 		}
+
 	}
 }

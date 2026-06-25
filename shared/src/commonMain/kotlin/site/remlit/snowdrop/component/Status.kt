@@ -1,5 +1,6 @@
 package site.remlit.snowdrop.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,6 +8,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -21,11 +25,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.painterResource
 import site.remlit.snowdrop.ProfileRoute
@@ -34,6 +41,8 @@ import site.remlit.snowdrop.component.dropdown.DangerDropdownItem
 import site.remlit.snowdrop.model.Status
 import site.remlit.snowdrop.model.User
 import site.remlit.snowdrop.util.LocalNavController
+import site.remlit.snowdrop.util.WarningColor
+import site.remlit.snowdrop.util.WarningColor25
 import site.remlit.snowdrop.util.atRoute
 import site.remlit.snowdrop.util.getCurrentAccountObjectFlow
 import site.remlit.snowdrop.util.toFormatShort
@@ -59,6 +68,7 @@ import snowdrop.shared.generated.resources.icon_reply_all_24px
 import snowdrop.shared.generated.resources.icon_star_24px
 import snowdrop.shared.generated.resources.icon_star_filled_24px
 import snowdrop.shared.generated.resources.icon_volume_off_24px
+import snowdrop.shared.generated.resources.icon_warning_24px
 
 @Composable
 fun Status(status: Status) {
@@ -82,6 +92,7 @@ fun Status(status: Status) {
 		rebloggingAccount = status.account
 	}
 
+	var cwOpen by remember { mutableStateOf(false) }
 	var showDropdown by remember { mutableStateOf(false) }
 
 
@@ -176,11 +187,58 @@ fun Status(status: Status) {
 				}
 			}
 
-			// Content
-			Column(modifier = Modifier.padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)) {
+
+			/*
+			*
+			*  Content
+			*
+			*/
+
+			@Composable
+			fun renderContent() {
 				if (realStatus.content != null) {
 					HtmlContent(realStatus.content!!, realStatus.mentions)
 				}
+			}
+
+			Column(modifier = Modifier.padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)) {
+
+				if (realStatus.spoilerText != null && !realStatus.spoilerText!!.isBlank()) {
+					Column(
+						modifier = Modifier.fillMaxWidth()
+							.clip(RoundedCornerShape(10.dp))
+							.background(WarningColor25)
+							.clickable(onClick = {
+								cwOpen = !cwOpen
+							})
+					) {
+						Row(
+							modifier = Modifier.padding(start = 15.dp, end = 15.dp, top = 10.dp, bottom = 10.dp)
+								.fillMaxWidth(),
+							horizontalArrangement = Arrangement.spacedBy(10.dp),
+							verticalAlignment = Alignment.CenterVertically
+						) {
+							Icon(painterResource(Res.drawable.icon_warning_24px), null)
+
+							Column {
+								Text(
+									realStatus.spoilerText!!,
+									fontWeight = FontWeight.Medium
+								)
+								Text(
+									if (!cwOpen) "Show content"
+									else "Hide content",
+									fontSize = 12.sp
+								)
+							}
+						}
+					}
+
+					if (cwOpen) Column(
+						modifier = Modifier.padding(top = 10.dp)
+					) { renderContent() }
+				} else renderContent()
+
 			}
 
 			if (realStatus.reactions.isEmpty()) {
