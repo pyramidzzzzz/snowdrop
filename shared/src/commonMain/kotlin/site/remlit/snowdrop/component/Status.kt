@@ -133,34 +133,37 @@ fun Status(status: Status) {
 			// todo: not vertically centered correctly
 		) {
 			if (isReblog && rebloggingAccount != null) {
-				val accountName = rebloggingAccount!!.displayName ?: rebloggingAccount!!.username
-				Row(
-					modifier = Modifier.padding(start = 35.dp),
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					Icon(
-						painterResource(Res.drawable.icon_repeat_24px),
-						null,
-						modifier = Modifier.padding(end = 5.dp),
-						tint = MaterialTheme.colorScheme.secondary
-					)
-					Text(
-						accountName,
-						color = MaterialTheme.colorScheme.secondary,
-						fontSize = 14.sp,
-						fontWeight = FontWeight.Medium,
-						maxLines = 1,
-						overflow = TextOverflow.Ellipsis,
-						modifier = Modifier.weight(1f)
-					)
-					Text(
-						" boosted",
-						color = MaterialTheme.colorScheme.secondary,
-						fontSize = 14.sp,
-						fontWeight = FontWeight.Medium,
-						maxLines = 1
-					)
-				}
+						Row(
+							modifier = Modifier.padding(start = 35.dp),
+							verticalAlignment = Alignment.CenterVertically
+						) {
+							Icon(
+								painterResource(Res.drawable.icon_repeat_24px),
+								null,
+								modifier = Modifier.padding(end = 5.dp),
+								tint = MaterialTheme.colorScheme.secondary
+							)
+							Row(
+								modifier = Modifier.weight(1f, fill = false),
+								verticalAlignment = Alignment.CenterVertically
+							) {
+								Text(
+									rebloggingAccount!!.displayName ?: rebloggingAccount!!.username,
+									color = MaterialTheme.colorScheme.secondary,
+									fontSize = 14.sp,
+									fontWeight = FontWeight.Medium,
+									overflow = TextOverflow.Ellipsis,
+									maxLines = 1,
+									modifier = Modifier.weight(1f, fill = false)
+								)
+								Text(
+									" boosted",
+									color = MaterialTheme.colorScheme.secondary,
+									fontSize = 14.sp,
+									fontWeight = FontWeight.Medium
+								)
+							}
+						}
 			}
 
 			// Header
