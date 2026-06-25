@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.AnnotatedString
@@ -101,8 +102,8 @@ fun Notification(notification: Notification) {
 					}
 
 					Row(
-						modifier = Modifier.fillMaxWidth(),
-						horizontalArrangement = Arrangement.spacedBy(5.dp)
+						horizontalArrangement = Arrangement.spacedBy(5.dp),
+						verticalAlignment = Alignment.CenterVertically
 					) {
 						var displayName by remember { mutableStateOf("") }
 						var message by remember { mutableStateOf("") }
@@ -123,6 +124,8 @@ fun Notification(notification: Notification) {
 								else if (notification.status != null) "bit your post"
 								else "bit you"
 						}
+
+						val timestamp = "${notification.getCreatedAtTimestamp()?.toRelativeString()}"
 
 						/*
 						* Actually render the link and style it and all that stuff
@@ -155,7 +158,18 @@ fun Notification(notification: Notification) {
 							toAnnotatedString()
 						}
 
-						Text(title)
+						Text(
+							text = title,
+							modifier = Modifier.weight(1f),
+							maxLines = 1,
+							overflow = TextOverflow.Ellipsis
+						)
+
+						Text(
+							text = timestamp,
+							fontSize = 13.sp,
+							maxLines = 1
+						)
 					}
 				}
 
