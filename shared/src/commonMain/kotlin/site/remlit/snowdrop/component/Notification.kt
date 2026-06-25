@@ -5,17 +5,35 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.LinkInteractionListener
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineBreak
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withLink
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.painterResource
@@ -41,6 +59,7 @@ fun Notification(notification: Notification) {
 		Column {
 			Column(
 				modifier = Modifier.padding(15.dp)
+					.fillMaxWidth()
 			) {
 				Row(
 					horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -82,70 +101,62 @@ fun Notification(notification: Notification) {
 					}
 
 					Row(
+						modifier = Modifier.fillMaxWidth(),
 						horizontalArrangement = Arrangement.spacedBy(5.dp)
 					) {
+						var displayName by remember { mutableStateOf("") }
+						var message by remember { mutableStateOf("") }
+
 						when (notification.type) {
-							"favourite", "pleroma:emoji_reaction", "reblog", "update", "poll", "bite" -> Text(
-								notification.account.displayName ?: notification.account.username,
-								fontWeight = FontWeight.Bold,
-								maxLines = 1,
-								modifier = Modifier.clickable(
-									onClick = { navHandler.navigate(ProfileRoute(notification.account.id))}
-								)
-							)
+							"favourite", "pleroma:emoji_reaction", "reblog", "update", "bite" ->
+								displayName = notification.account.displayName
+									?: notification.account.username
 						}
 
 						when (notification.type) {
-							"favourite" -> Text(
-								"liked your post",
-								modifier = Modifier.weight(1f)
-							)
-							"pleroma:emoji_reaction" -> Text(
-								"reacted with " + notification.emoji,
-								modifier = Modifier.weight(1f)
-							)
-							"reblog" -> Text(
-								"boosted your post",
-								modifier = Modifier.weight(1f)
-							)
-							"update" -> Text(
-								"edited a post",
-								modifier = Modifier.weight(1f)
-							)
-							"poll" -> Text(
-								"poll has ended",
-								modifier = Modifier.weight(1f)
-							)
-							"bite" -> {
-								if (notification.bite?.biteBack == true) Text(
-									"bit you back",
-									modifier = Modifier.weight(1f)
-								)
-								else if (notification.status != null) Text(
-									"bit your post",
-									modifier = Modifier.weight(1f)
-								)
-								else Text(
-									"bit you",
-									modifier = Modifier.weight(1f)
-								)
+							"favourite" -> message = "liked your post"
+							"pleroma:emoji_reaction" -> message = "reacted with ${notification.emoji}"
+							"reblog" -> message = "boosted your post"
+							"update" -> message = "edited a post"
+							"poll" -> message = "A poll you have voted in has ended"
+							"bite" -> message = if (notification.bite?.biteBack == true) "bit you back"
+								else if (notification.status != null) "bit your post"
+								else "bit you"
+						}
+
+						/*
+						* Actually render the link and style it and all that stuff
+						*/
+						val linkListener = LinkInteractionListener { link ->
+							if (link is LinkAnnotation.Clickable) {
+								navHandler.navigate(ProfileRoute(link.tag))
 							}
 						}
 
-						Text(
-							"${notification.getCreatedAtTimestamp()?.toRelativeString()}",
-							fontSize = 13.sp,
-							maxLines = 1,
-							modifier = Modifier.requiredWidth(IntrinsicSize.Min)
-						)
+						val title = buildAnnotatedString {
+							withLink(
+								LinkAnnotation.Clickable(
+									tag = notification.account.id,
+									linkInteractionListener = linkListener,
+									styles = TextLinkStyles(
+										style = SpanStyle(
+											textDecoration = TextDecoration.None,
+											color = MaterialTheme.colorScheme.onBackground
+										)
+									)
+								)
+							) {
+								withStyle(style = SpanStyle(
+									fontWeight = FontWeight.Bold
+								)) { append(displayName) }
+							}
+
+							append(" $message")
+							toAnnotatedString()
+						}
+
+						Text(title)
 					}
-
-
-
-
-					/*Row(modifier = Modifier.width(IntrinsicSize.Min)) {
-
-					}*/
 				}
 
 				if (notification.status != null) {
