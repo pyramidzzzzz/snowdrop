@@ -133,6 +133,7 @@ fun Status(status: Status) {
 			// todo: not vertically centered correctly
 		) {
 			if (isReblog && rebloggingAccount != null) {
+				val accountName = rebloggingAccount!!.displayName ?: rebloggingAccount!!.username
 				Row(
 					modifier = Modifier.padding(start = 35.dp),
 					verticalAlignment = Alignment.CenterVertically
@@ -144,10 +145,20 @@ fun Status(status: Status) {
 						tint = MaterialTheme.colorScheme.secondary
 					)
 					Text(
-						"${rebloggingAccount!!.displayName ?: rebloggingAccount!!.username} boosted",
+						accountName,
 						color = MaterialTheme.colorScheme.secondary,
 						fontSize = 14.sp,
-						fontWeight = FontWeight.Medium
+						fontWeight = FontWeight.Medium,
+						maxLines = 1,
+						overflow = TextOverflow.Ellipsis,
+						modifier = Modifier.weight(1f)
+					)
+					Text(
+						" boosted",
+						color = MaterialTheme.colorScheme.secondary,
+						fontSize = 14.sp,
+						fontWeight = FontWeight.Medium,
+						maxLines = 1
 					)
 				}
 			}
