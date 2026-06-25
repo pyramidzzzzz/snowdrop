@@ -45,6 +45,7 @@ import site.remlit.snowdrop.util.toRelativeString
 import snowdrop.shared.generated.resources.Res
 import snowdrop.shared.generated.resources.icon_add_24px
 import snowdrop.shared.generated.resources.icon_edit_24px
+import snowdrop.shared.generated.resources.icon_notifications_active_24
 import snowdrop.shared.generated.resources.icon_repeat_24px
 import snowdrop.shared.generated.resources.icon_poll_24px
 import snowdrop.shared.generated.resources.icon_star_24px
@@ -86,6 +87,10 @@ fun Notification(notification: Notification) {
 							painterResource(Res.drawable.icon_poll_24px), null,
 							tint = MaterialTheme.colorScheme.primary
 						)
+						"status" -> Icon(
+							painterResource(Res.drawable.icon_notifications_active_24), null,
+							tint = MaterialTheme.colorScheme.primary
+						)
 						"bite" -> Icon( // todo: tooth, and test bite notifs
 							painterResource(Res.drawable.icon_tooth_24px), null,
 							tint = MaterialTheme.colorScheme.primary
@@ -109,7 +114,7 @@ fun Notification(notification: Notification) {
 						var message by remember { mutableStateOf("") }
 
 						when (notification.type) {
-							"favourite", "pleroma:emoji_reaction", "reblog", "update", "bite" ->
+							"favourite", "pleroma:emoji_reaction", "reblog", "update", "status", "bite" ->
 								displayName = notification.account.displayName
 									?: notification.account.username
 						}
@@ -120,6 +125,7 @@ fun Notification(notification: Notification) {
 							"reblog" -> message = "boosted your post"
 							"update" -> message = "edited a post"
 							"poll" -> message = "A poll you have voted in has ended"
+							"status" -> message = "just posted"
 							"bite" -> message = if (notification.bite?.biteBack == true) "bit you back"
 								else if (notification.status != null) "bit your post"
 								else "bit you"
