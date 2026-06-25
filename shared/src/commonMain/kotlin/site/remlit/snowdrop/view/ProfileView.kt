@@ -80,6 +80,8 @@ fun ProfileView(id: String) = ViewSurface {
 		ready = true
 	}
 
+	val verticalOffset = (-((bigAvatarSize/2))).dp
+
 	Column {
 		TopAppBar(
 			navigationIcon = {
@@ -149,15 +151,15 @@ fun ProfileView(id: String) = ViewSurface {
 
 					// The Rest
 					Column(
-						modifier = Modifier.padding(start = 15.dp, end = 15.dp, top = 0.dp, bottom = 10.dp)
-							.offset(y = (-((bigAvatarSize/2))).dp)
+						modifier = Modifier.padding(start = 15.dp, end = 15.dp, top = 0.dp, bottom = 15.dp)
+							.offset(y = verticalOffset)
 					) {
 						// top of header, avatar and button
 						Row(
-							modifier = Modifier.padding(bottom = 10.dp),
+							modifier = Modifier.padding(bottom = 10.dp)
+								.fillMaxWidth(),
 
-							verticalAlignment = Alignment.Bottom,
-							horizontalArrangement = Arrangement.SpaceBetween
+							verticalAlignment = Alignment.Bottom
 						) {
 							// jank outer border
 							Box(contentAlignment = Alignment.Center) {
@@ -171,13 +173,20 @@ fun ProfileView(id: String) = ViewSurface {
 								Avatar(user = account!!, big = true)
 							}
 
-							if (isMe) {
-								OutlinedButton(onClick = {}) {
-									Text("Edit profile")
-								}
-							} else {
-								OutlinedButton(onClick = {}) {
-									Text("Follow")
+							Row(
+								modifier = Modifier.fillMaxWidth(),
+								horizontalArrangement = Arrangement.End
+							) {
+								Row {
+									if (isMe) {
+										OutlinedButton(onClick = {}) {
+											Text("Edit profile")
+										}
+									} else {
+										OutlinedButton(onClick = {}) {
+											Text("Follow")
+										}
+									}
 								}
 							}
 						}
@@ -249,6 +258,20 @@ fun ProfileView(id: String) = ViewSurface {
 							}
 						}
 					}
+
+					Column(
+						modifier = Modifier.offset(y = verticalOffset)
+					) {
+						HorizontalDivider(
+							thickness = 1.dp,
+							color = MaterialTheme.colorScheme.surfaceContainer
+						)
+
+
+					}
+					// stay inside this above column ^^^
+					// if you don't, there's a weird bottom space caused by the offset
+					// and other things. this fixes it.
 				}
 			}
 		}
