@@ -112,7 +112,8 @@ fun Notification(notification: Notification) {
 									maxLines = 1,
 									modifier = Modifier.weight(1f)
 								)
-								else Text("bit you",
+								else Text(
+									"bit you",
 									maxLines = 1,
 									modifier = Modifier.weight(1f)
 								)
