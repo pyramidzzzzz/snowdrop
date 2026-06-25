@@ -42,15 +42,18 @@ import com.russhwolf.settings.ExperimentalSettingsApi
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.painterResource
 import site.remlit.snowdrop.ProfileRoute
 import site.remlit.snowdrop.api.accounts.getAccount
+import site.remlit.snowdrop.api.accounts.getRelationships
 import site.remlit.snowdrop.component.Avatar
 import site.remlit.snowdrop.component.HtmlContent
 import site.remlit.snowdrop.component.ViewSurface
 import site.remlit.snowdrop.component.bigAvatarRadius
 import site.remlit.snowdrop.component.bigAvatarSize
 import site.remlit.snowdrop.model.User
+import site.remlit.snowdrop.model.response.RelationshipResponse
 import site.remlit.snowdrop.util.LocalNavController
 import site.remlit.snowdrop.util.atRoute
 import site.remlit.snowdrop.util.formatNumber
@@ -76,9 +79,11 @@ fun ProfileView(id: String) = ViewSurface {
 		.collectAsStateWithLifecycle(null)
 
 	var account by remember { mutableStateOf<User?>(null) }
-	var isMe by remember { mutableStateOf(account != null && currentAccount != null &&
-			account?.id == currentAccount?.id) }
 	var ready by remember { mutableStateOf(false) }
+
+	var isMe by remember { mutableStateOf(true) }
+	if (currentAccount != null && currentAccount?.id == account?.id)
+		isMe = true
 
 	val scrollState = rememberScrollState()
 
@@ -90,6 +95,15 @@ fun ProfileView(id: String) = ViewSurface {
 
 		ready = true
 	}
+
+	/* todo: relationships on profile view
+	* var relationships by remember { mutableStateOf<List<RelationshipResponse>?>(null) }
+	if (!isMe) runBlocking {
+		val req = getRelationships(listOf(currentAccount!!.id, account!!.id))
+		if (req.error) return@runBlocking
+		if (req.response == null) return@runBlocking
+		relationships = req.response
+	}*/
 
 	val verticalOffset = (-((bigAvatarSize/2) - 4)).dp
 	var selectedTab by remember { mutableStateOf(0) }
