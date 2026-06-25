@@ -26,7 +26,8 @@ import site.remlit.snowdrop.component.Status as StatusComponent
 
 @Composable
 fun StatusView(id: String) = ViewSurface {
-	val currentAccount by getCurrentAccountObjectFlow().collectAsStateWithLifecycle(null)
+	val currentAccount by getCurrentAccountObjectFlow()
+		.collectAsStateWithLifecycle(null)
 
 	var status by remember { mutableStateOf<Status?>(null) }
 	var ready by remember { mutableStateOf(false) }
