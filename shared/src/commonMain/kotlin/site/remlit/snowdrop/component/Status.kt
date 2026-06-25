@@ -248,7 +248,9 @@ fun Status(status: Status) {
 					AnimatedVisibility(cwOpen) {
 						Column(
 							modifier = Modifier.padding(top = 10.dp)
-						) { renderContent() }
+						) {
+							renderContent()
+						}
 					}
 				} else renderContent()
 

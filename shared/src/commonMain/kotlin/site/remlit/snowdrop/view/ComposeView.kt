@@ -125,17 +125,7 @@ fun ComposeView() = ViewSurface {
 				) {
 					Row {
 						TextButton(onClick = { visibilityDropdownOpen = !visibilityDropdownOpen }) {
-							Row(
-								horizontalArrangement = Arrangement.spacedBy(5.dp)
-							) {
-								Visibility(visibility)
-								when (visibility) {
-									"public" -> Text("Public")
-									"unlisted" -> Text("Unlisted")
-									"private" -> Text("Private")
-									"direct" -> Text("Direct")
-								}
-							}
+							Visibility(visibility, true)
 						}
 
 						DropdownMenu(

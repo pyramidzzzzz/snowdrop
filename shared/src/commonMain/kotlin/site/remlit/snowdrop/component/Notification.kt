@@ -88,7 +88,6 @@ fun Notification(notification: Notification) {
 							"favourite", "pleroma:emoji_reaction", "reblog", "update", "poll", "bite" -> Text(
 								notification.account.displayName ?: notification.account.username,
 								fontWeight = FontWeight.Bold,
-								overflow = TextOverflow.Ellipsis,
 								maxLines = 1,
 								modifier = Modifier.clickable(
 									onClick = { navHandler.navigate(ProfileRoute(notification.account.id))}
@@ -99,43 +98,35 @@ fun Notification(notification: Notification) {
 						when (notification.type) {
 							"favourite" -> Text(
 								"liked your post",
-								maxLines = 1,
 								modifier = Modifier.weight(1f)
 							)
 							"pleroma:emoji_reaction" -> Text(
 								"reacted with " + notification.emoji,
-								maxLines = 1,
 								modifier = Modifier.weight(1f)
 							)
 							"reblog" -> Text(
 								"boosted your post",
-								maxLines = 1,
 								modifier = Modifier.weight(1f)
 							)
 							"update" -> Text(
 								"edited a post",
-								maxLines = 1,
 								modifier = Modifier.weight(1f)
 							)
 							"poll" -> Text(
 								"poll has ended",
-								maxLines = 1,
 								modifier = Modifier.weight(1f)
 							)
 							"bite" -> {
 								if (notification.bite?.biteBack == true) Text(
 									"bit you back",
-									maxLines = 1,
 									modifier = Modifier.weight(1f)
 								)
 								else if (notification.status != null) Text(
 									"bit your post",
-									maxLines = 1,
 									modifier = Modifier.weight(1f)
 								)
 								else Text(
 									"bit you",
-									maxLines = 1,
 									modifier = Modifier.weight(1f)
 								)
 							}
