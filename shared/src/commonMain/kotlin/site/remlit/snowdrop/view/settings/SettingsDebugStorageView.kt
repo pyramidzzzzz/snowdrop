@@ -102,8 +102,12 @@ fun SettingsDebugStorageView(
 				HorizontalDivider()
 
 				blockingCache.keys.forEach {
-					if (!it.startsWith("e_")) return@forEach
-					renderKeyVal(it, getCacheEntry(it).toString())
+					if (!it.startsWith("entry_")) return@forEach
+					renderKeyVal(
+						it,
+						getCacheEntry(it.replace("entry_", ""))
+							.toString()
+					)
 				}
 			}
 		}

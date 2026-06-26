@@ -119,7 +119,7 @@ fun LoginView(
 			blockingSettings.putString("account_${currentAccountId}_token", res.response.accessToken)
 			blockingSettings.putBoolean("logged_in", true)
 
-			updateCurrentAccountObject(res.response.accessToken)
+			updateCurrentAccountObject()
 		}
 
 		navigateToTimeline()

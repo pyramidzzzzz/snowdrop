@@ -41,6 +41,30 @@ fun getCacheEntry(id: String): CacheEntry? {
 	return cbor.decodeFromHexString(raw)
 }
 
+@OptIn(ExperimentalSerializationApi::class)
+inline fun <reified T> putCacheEntry(
+	id: String,
+	content: T
+) {
+	val entry = CacheEntry(
+		id,
+		cbor.encodeToHexString<T>(content)
+	)
+
+	val manifest = getCacheManifest()
+	blockingCache.putString(
+		"manifest",
+		cbor.encodeToHexString(
+			manifest.copy(ids = manifest.ids.plus(id).distinct())
+		)
+	)
+
+	blockingCache.putString(
+		"entry_$id",
+		cbor.encodeToHexString(entry)
+	)
+}
+
 fun cleanExpiredCacheEntries() {
 
 }

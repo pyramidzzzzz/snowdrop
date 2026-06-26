@@ -55,27 +55,25 @@ fun getCurrentAccountObjectFlow(): Flow<User> = object : Flow<User> {
 		if (getCurrentAccountId() == "")
 			return@safe
 
-		if (settings.getStringOrNull("account_${getCurrentAccountId()}_user") == null)
+		if (getCacheEntry("account_${getCurrentAccountId()}") == null)
 			updateCurrentAccountObject()
 
-		val user = json.decodeFromString<User>(
-			settings.getString("account_${getCurrentAccountId()}_user", "")
+		collector.emit(
+			getCacheEntry("account_${getCurrentAccountId()}")!!
+				.getContent<User>()
 		)
-
-		collector.emit(user)
 	}
 }
 
-suspend fun updateCurrentAccountObject(token: String? = null) {
-	val verifyRes = verifyCredentials(token)
+suspend fun updateCurrentAccountObject() {
+	val verifyRes = verifyCredentials()
 	if (verifyRes.error) return
 	if (verifyRes.response !is User) return
 
-	blockingSettings.putString(
-		"account_${getCurrentAccountId()}_user",
-		json.encodeToString(verifyRes.response)
+	putCacheEntry(
+		"account_${getCurrentAccountId()}",
+		verifyRes.response
 	)
-	blockingSettings.putString("account_${getCurrentAccountId()}_token", token!!)
 }
 
 /** Used for compose post FAB */
