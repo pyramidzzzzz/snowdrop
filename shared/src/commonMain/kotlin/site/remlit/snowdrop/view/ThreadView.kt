@@ -57,7 +57,7 @@ fun ThreadView(id: String, status: Status? = null) = ViewSurface {
 
 		threadStatuses.clear()
 		threadStatuses.add(status!!)
-		val res = getStatusContext(status!!.id)
+		val res = getStatusContext(status!!.id!!)
 		if (res.error) return@LaunchedEffect
 		if (res.response == null) return@LaunchedEffect
 		context.value = res.response
@@ -76,7 +76,7 @@ fun ThreadView(id: String, status: Status? = null) = ViewSurface {
 			}
 			else Column {
 				Text(
-					"Post by " + (status!!.account.displayName ?: status!!.account.username),
+					"Post by " + (status!!.account?.displayName ?: status!!.account?.username),
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis
 				)
@@ -99,7 +99,7 @@ fun ThreadView(id: String, status: Status? = null) = ViewSurface {
 			items(
 				items = threadStatuses,
 				key = { status ->
-					status.id
+					status.id!!
 				}
 			) { status ->
 				StatusComponent(status)
