@@ -65,6 +65,7 @@ kotlin {
 			implementation(libs.ktor.client.core)
 			implementation(libs.kotlinx.coroutines.core)
 			implementation(libs.kotlinx.serialization.json)
+			implementation(libs.kotlinx.serialization.cbor)
 
 			implementation(libs.kermit)
 			implementation(libs.kamel.image.default)

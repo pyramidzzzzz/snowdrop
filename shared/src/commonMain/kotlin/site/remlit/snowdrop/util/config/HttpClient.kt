@@ -10,12 +10,6 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import site.remlit.snowdrop.exception.ApiException
 
-val json = Json {
-	prettyPrint = true
-	isLenient = true
-	ignoreUnknownKeys = true
-}
-
 val httpClient = HttpClient {
 	install(ContentNegotiation) {
 		json(json)

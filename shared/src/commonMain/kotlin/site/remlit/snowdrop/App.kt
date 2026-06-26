@@ -55,15 +55,9 @@ import site.remlit.snowdrop.util.safe
 import site.remlit.snowdrop.util.scrollingUpward
 import site.remlit.snowdrop.util.settings
 import site.remlit.snowdrop.util.setupAppSettings
-import site.remlit.snowdrop.view.ComposeView
-import site.remlit.snowdrop.view.ExploreView
-import site.remlit.snowdrop.view.LoginView
-import site.remlit.snowdrop.view.NotificationsView
-import site.remlit.snowdrop.view.ProfileView
-import site.remlit.snowdrop.view.StartView
-import site.remlit.snowdrop.view.StatusView
-import site.remlit.snowdrop.view.TimelineView
-import site.remlit.snowdrop.view.settings.SettingsView
+import site.remlit.snowdrop.util.setupCache
+import site.remlit.snowdrop.view.*
+import site.remlit.snowdrop.view.settings.*
 import snowdrop.shared.generated.resources.Res
 import snowdrop.shared.generated.resources.icon_account_circle_24px
 import snowdrop.shared.generated.resources.icon_account_circle_filled_24px
@@ -98,6 +92,8 @@ object ComposeRoute : Destination(8)
 
 @Serializable
 object SettingsRoute : Destination(100)
+@Serializable
+data class SettingsDebugStorageRoute(val storage: Int) : Destination(101)
 
 
 @Composable
@@ -105,6 +101,7 @@ object SettingsRoute : Destination(100)
 @OptIn(ExperimentalSettingsApi::class)
 fun App() = safe {
 	setupAppSettings()
+	setupCache()
 
 	/*
 	* Variables & Handlers for Whole App Stuff
@@ -140,8 +137,9 @@ fun App() = safe {
 
 	fun shouldHideBottomBar(): Boolean =
 		atRoute<ProfileRoute>(currentDest) ||
+			atRoute<ComposeRoute>(currentDest) ||
 			atRoute<SettingsRoute>(currentDest) ||
-			atRoute<ComposeRoute>(currentDest)
+			atRoute<SettingsDebugStorageRoute>(currentDest)
 
 	fun shouldShowComposeFab(): Boolean =
 		loggedIn == true &&
@@ -291,8 +289,13 @@ fun App() = safe {
 							}
 
 							composable<ComposeRoute> { ComposeView() }
+
 							// Settings
 							composable<SettingsRoute> { SettingsView() }
+							composable<SettingsDebugStorageRoute> {
+								val args = it.toRoute<SettingsDebugStorageRoute>()
+								SettingsDebugStorageView(args.storage)
+							}
 						}
 					}
 				}

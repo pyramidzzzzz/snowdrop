@@ -7,5 +7,5 @@ import com.russhwolf.settings.coroutines.toFlowSettings
 import platform.Foundation.NSUserDefaults
 
 @OptIn(ExperimentalSettingsApi::class)
-actual val settings: FlowSettings = NSUserDefaultsSettings(NSUserDefaults(suiteName = "snowdrop_settings"))
+actual val cache: FlowSettings = NSUserDefaultsSettings(NSUserDefaults(suiteName = "snowdrop_cache"))
 	.toFlowSettings()
