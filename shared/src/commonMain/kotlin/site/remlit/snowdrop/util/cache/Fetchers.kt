@@ -20,5 +20,7 @@ fun fetchAccount(id: String): Flow<Account> = object : Flow<Account> {
 		val req = getAccount(id)
 		if (!req.error && req.response != null)
 			collector.emit(req.response)
+
+		putCacheEntry("account_$id", req.response)
 	}
 }

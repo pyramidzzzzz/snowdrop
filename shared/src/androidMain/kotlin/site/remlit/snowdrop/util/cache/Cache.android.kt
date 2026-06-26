@@ -1,10 +1,11 @@
-package site.remlit.snowdrop.util
+package site.remlit.snowdrop.util.cache
 
 import android.content.Context
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.SharedPreferencesSettings
 import com.russhwolf.settings.coroutines.FlowSettings
 import com.russhwolf.settings.coroutines.toFlowSettings
+import site.remlit.snowdrop.util.AndroidContext
 
 
 @OptIn(ExperimentalSettingsApi::class)
