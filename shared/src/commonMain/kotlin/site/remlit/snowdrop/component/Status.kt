@@ -37,7 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.russhwolf.settings.ExperimentalSettingsApi
 import org.jetbrains.compose.resources.painterResource
 import site.remlit.snowdrop.ProfileRoute
-import site.remlit.snowdrop.StatusRoute
+import site.remlit.snowdrop.ThreadRoute
 import site.remlit.snowdrop.component.dropdown.DangerDropdownItem
 import site.remlit.snowdrop.model.Status
 import site.remlit.snowdrop.model.User
@@ -119,9 +119,9 @@ fun Status(status: Status) {
 	Column(
 		modifier = Modifier.clickable(
 				// todo: fix this when we add ascendants/descendants (idk how to get the id of the current view)
-				enabled = !atRoute<StatusRoute>(currentDest),
+				enabled = !atRoute<ThreadRoute>(currentDest),
 				onClick = {
-					navHandler.navigate(StatusRoute(realStatus.id))
+					navHandler.navigate(ThreadRoute(realStatus.id))
 				}
 			)
 	) {

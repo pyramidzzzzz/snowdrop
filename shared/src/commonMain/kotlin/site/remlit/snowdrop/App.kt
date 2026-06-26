@@ -61,7 +61,7 @@ import site.remlit.snowdrop.view.LoginView
 import site.remlit.snowdrop.view.NotificationsView
 import site.remlit.snowdrop.view.ProfileView
 import site.remlit.snowdrop.view.StartView
-import site.remlit.snowdrop.view.StatusView
+import site.remlit.snowdrop.view.ThreadView
 import site.remlit.snowdrop.view.TimelineView
 import site.remlit.snowdrop.view.settings.SettingsView
 import snowdrop.shared.generated.resources.Res
@@ -92,7 +92,7 @@ object MyProfileRoute : Destination(5)
 @Serializable
 data class ProfileRoute(val id: String) : Destination(6)
 @Serializable
-data class StatusRoute(val id: String) : Destination(7)
+data class ThreadRoute(val id: String) : Destination(7)
 @Serializable
 object ComposeRoute : Destination(8)
 
@@ -281,9 +281,9 @@ fun App() = safe {
 								else Text("Error")
 							}
 
-							composable<StatusRoute> {
-								val args = it.toRoute<StatusRoute>()
-								StatusView(args.id)
+							composable<ThreadRoute> {
+								val args = it.toRoute<ThreadRoute>()
+								ThreadView(args.id)
 							}
 							composable<ProfileRoute> {
 								val args = it.toRoute<ProfileRoute>()

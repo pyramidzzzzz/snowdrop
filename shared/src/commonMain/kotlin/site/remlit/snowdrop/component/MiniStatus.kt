@@ -20,7 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.painterResource
-import site.remlit.snowdrop.StatusRoute
+import site.remlit.snowdrop.ThreadRoute
 import site.remlit.snowdrop.model.Status
 import site.remlit.snowdrop.util.LocalNavController
 import site.remlit.snowdrop.util.extension.toRelativeString
@@ -36,7 +36,7 @@ fun MiniStatus(status: Status) {
 			.clip(RoundedCornerShape(10.dp))
 			.border(1.dp, MaterialTheme.colorScheme.surfaceContainerHigh, RoundedCornerShape(10.dp))
 			.clickable(onClick = {
-				navHandler.navigate(StatusRoute(status.id))
+				navHandler.navigate(ThreadRoute(status.id))
 			})
 	) {
 		Column(modifier = Modifier.padding(10.dp)) {
