@@ -102,15 +102,16 @@ fun ComposeView() = ViewSurface {
 	) {
 		if (currentAccount != null) {
 			Row(
-				modifier = Modifier.padding(10.dp),
+				modifier = Modifier.padding(10.dp)
+					.fillMaxWidth(),
 				horizontalArrangement = Arrangement.spacedBy(10.dp),
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				Avatar(currentAccount!!)
 
 				Column(
-				modifier = Modifier.weight(1f, fill = false)
-			) {
+					modifier = Modifier.weight(1f)
+				) {
 					Text(
 						currentAccount!!.displayName ?: currentAccount!!.username,
 						fontWeight = FontWeight.Medium,
@@ -127,7 +128,6 @@ fun ComposeView() = ViewSurface {
 				}
 
 				Row(
-					modifier = Modifier.fillMaxWidth(),
 					horizontalArrangement = Arrangement.End
 				) {
 					Row {
