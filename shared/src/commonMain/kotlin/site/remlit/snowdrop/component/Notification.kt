@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.LinkInteractionListener
 import androidx.compose.ui.text.SpanStyle
@@ -24,9 +25,9 @@ import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.painterResource
@@ -103,7 +104,7 @@ fun Notification(notification: Notification) {
 								navHandler.navigate(ProfileRoute(notification.account.id))
 							})
 					) {
-						Avatar(notification.account, small = true)
+						Avatar(notification.account, smaller = true)
 					}
 
 					Row(
@@ -165,11 +166,11 @@ fun Notification(notification: Notification) {
 							toAnnotatedString()
 						}
 
+						// todo: make only display name not wrap
 						Text(
 							text = title,
 							modifier = Modifier.weight(1f),
-							maxLines = 1,
-							overflow = TextOverflow.Ellipsis
+							lineHeight = with(LocalDensity.current) { smallerAvatarSize.dp.toSp() }
 						)
 
 						Text(
