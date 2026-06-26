@@ -25,6 +25,8 @@ fun getCurrentAccountId() = blockingSettings.getString("current_account", "")
 fun getCurrentAccountHost() = blockingSettings.getString("account_${getCurrentAccountId()}_host", "")
 
 fun logoutAccount(accountId: String) {
+	Features.reset()
+
 	blockingSettings.putBoolean("logged_in", false)
 	blockingSettings.remove("current_account")
 	blockingSettings.remove("account_${accountId}_host")
