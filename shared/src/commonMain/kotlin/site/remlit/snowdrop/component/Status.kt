@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -195,22 +196,26 @@ fun Status(status: Status) {
 
 				Column(
 					modifier = Modifier.weight(1f)
-						.clickable(onClick = {
-							navHandler.navigate(ProfileRoute(realStatus.account?.id!!))
-						})
+						.padding(end = 10.dp)
 				) {
 					Text(
 						realStatus.account?.displayName ?: realStatus.account?.username!!,
 						fontWeight = FontWeight.Medium,
 						overflow = TextOverflow.Ellipsis,
-						maxLines = 1
+						maxLines = 1,
+						modifier = Modifier.clickable(onClick = {
+							navHandler.navigate(ProfileRoute(realStatus.account?.id!!))
+						})
 					)
 					Text(
 						"@${realStatus.account?.acct}",
 						overflow = TextOverflow.Ellipsis,
 						color = MaterialTheme.colorScheme.onSurfaceVariant,
 						fontSize = 13.sp,
-						maxLines = 1
+						maxLines = 1,
+						modifier = Modifier.clickable(onClick = {
+							navHandler.navigate(ProfileRoute(realStatus.account?.id!!))
+						})
 					)
 				}
 
