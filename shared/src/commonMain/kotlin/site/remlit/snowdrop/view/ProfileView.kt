@@ -53,6 +53,7 @@ import site.remlit.snowdrop.component.bigAvatarSize
 import site.remlit.snowdrop.model.Account
 import site.remlit.snowdrop.util.LocalNavController
 import site.remlit.snowdrop.util.atRoute
+import site.remlit.snowdrop.util.cache.fetchAccount
 import site.remlit.snowdrop.util.extension.formatNumber
 import site.remlit.snowdrop.util.getCurrentAccountObjectFlow
 import site.remlit.snowdrop.util.settings
@@ -75,7 +76,7 @@ fun ProfileView(id: String) = ViewSurface {
 	val currentAccount by getCurrentAccountObjectFlow()
 		.collectAsStateWithLifecycle(null)
 
-	var account by remember { mutableStateOf<Account?>(null) }
+	val account by fetchAccount(id).collectAsStateWithLifecycle(null)
 	var ready by remember { mutableStateOf(false) }
 
 	var isMe by remember { mutableStateOf(false) }
@@ -83,15 +84,6 @@ fun ProfileView(id: String) = ViewSurface {
 		isMe = true
 
 	val scrollState = rememberScrollState()
-
-	LaunchedEffect(Dispatchers.Default) {
-		// todo: handle errors
-		val req = getAccount(id)
-		if (req.error) return@LaunchedEffect
-		account = req.response
-
-		ready = true
-	}
 
 	/* todo: relationships on profile view
 	* var relationships by remember { mutableStateOf<List<RelationshipResponse>?>(null) }

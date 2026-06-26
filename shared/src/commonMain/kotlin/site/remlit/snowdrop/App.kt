@@ -49,6 +49,7 @@ import site.remlit.snowdrop.model.ui.Destination
 import site.remlit.snowdrop.util.ExternalUriHandler
 import site.remlit.snowdrop.util.LocalNavController
 import site.remlit.snowdrop.util.atRoute
+import site.remlit.snowdrop.util.blockingSettings
 import site.remlit.snowdrop.util.getCurrentAccountObjectFlow
 import site.remlit.snowdrop.util.config.kamelConfig
 import site.remlit.snowdrop.util.safe
@@ -119,14 +120,15 @@ fun App() = safe {
 		.collectAsStateWithLifecycle(null)
 
 
-	var oauthCallback by remember { mutableStateOf<String?>(null) }
-
 	DisposableEffect(Unit) {
 		ExternalUriHandler.listener = { uri ->
 			Logger.d { "URI received: $uri" }
 
 			if (uri.startsWith("snowdrop://oauth-callback?code="))
-				oauthCallback = uri.replace("snowdrop://oauth-callback?code=", "")
+				blockingSettings.putString(
+					"oauth_callback",
+					uri.replace("snowdrop://oauth-callback?code=", "")
+				)
 
 			// if any other URIs need to be configured, they can be added here
 		}
@@ -267,7 +269,6 @@ fun App() = safe {
 
 							composable<LoginRoute> {
 								LoginView(
-									oauthCallbackCode = oauthCallback,
 									navigateToTimeline = { navController.navigate(TimelineRoute) },
 								)
 							}

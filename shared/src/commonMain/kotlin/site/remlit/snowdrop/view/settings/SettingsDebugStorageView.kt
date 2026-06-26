@@ -89,7 +89,6 @@ fun SettingsDebugStorageView(
 					renderString("account_${id}_token")
 					renderString("account_${id}_client_id")
 					renderString("account_${id}_client_secret")
-					renderString("account_${id}_user")
 				}
 			}
 			1 -> {

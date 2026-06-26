@@ -14,8 +14,8 @@ import site.remlit.snowdrop.util.settings
 
 @OptIn(ExperimentalSettingsApi::class)
 suspend fun verifyCredentials(): ApiResponse<Account> = safeApiRequest {
-	val host = getCurrentAccountHost()
 	val accountId = getCurrentAccountId()
+	val host = getCurrentAccountHost()
 	val token = settings.getString("account_${accountId}_token", "")
 
 	val req = httpClient.get("https://$host/api/v1/accounts/verify_credentials") {

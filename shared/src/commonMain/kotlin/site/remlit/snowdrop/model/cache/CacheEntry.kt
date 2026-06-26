@@ -1,9 +1,7 @@
 package site.remlit.snowdrop.model.cache
 
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromHexString
-import site.remlit.snowdrop.util.config.cbor
+import site.remlit.snowdrop.util.config.json
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -13,8 +11,7 @@ data class CacheEntry(
 	val content: String,
 	val createdAt: Instant = Clock.System.now()
 ) {
-	@OptIn(ExperimentalSerializationApi::class)
 	inline fun <reified T> getContent(): T {
-		return cbor.decodeFromHexString<T>(content)
+		return json.decodeFromString<T>(content)
 	}
 }

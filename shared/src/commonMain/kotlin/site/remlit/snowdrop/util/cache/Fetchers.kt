@@ -17,6 +17,7 @@ fun fetchAccount(id: String): Flow<Account> = object : Flow<Account> {
 			collector.emit(cached.getContent<Account>())
 		}
 
+		// todo: fix this failing
 		val req = getAccount(id)
 		if (!req.error && req.response != null)
 			collector.emit(req.response)

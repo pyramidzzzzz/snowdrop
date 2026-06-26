@@ -9,6 +9,7 @@ import kotlinx.serialization.encodeToHexString
 import site.remlit.snowdrop.model.cache.CacheEntry
 import site.remlit.snowdrop.model.cache.CacheManifest
 import site.remlit.snowdrop.util.config.cbor
+import site.remlit.snowdrop.util.config.json
 
 /* I don't think this will be used, but i'm keeping it just in case */
 @OptIn(ExperimentalSettingsApi::class)
@@ -48,7 +49,7 @@ inline fun <reified T> putCacheEntry(
 ) {
 	val entry = CacheEntry(
 		id,
-		cbor.encodeToHexString<T>(content)
+		json.encodeToString<T>(content)
 	)
 
 	val manifest = getCacheManifest()

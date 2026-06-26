@@ -41,6 +41,8 @@ import site.remlit.snowdrop.component.ViewSurface
 import site.remlit.snowdrop.model.response.CreateAppResponse
 import site.remlit.snowdrop.model.response.OauthToken
 import site.remlit.snowdrop.util.blockingSettings
+import site.remlit.snowdrop.util.cache.blockingCache
+import site.remlit.snowdrop.util.cache.setupCache
 import site.remlit.snowdrop.util.settings
 import site.remlit.snowdrop.util.setupAppSettings
 import site.remlit.snowdrop.util.updateCurrentAccountObject
@@ -49,7 +51,6 @@ import kotlin.uuid.Uuid
 @Composable
 @OptIn(ExperimentalSettingsApi::class)
 fun LoginView(
-	oauthCallbackCode: String? = null,
 	navigateToTimeline: () -> Unit
 ) = ViewSurface {
 	val uriHandler = LocalUriHandler.current
@@ -69,7 +70,7 @@ fun LoginView(
 	val currentAccountId by settings.getStringOrNullFlow("current_account")
 		.collectAsStateWithLifecycle(null)
 
-	val clientId by settings.getStringOrNullFlow("account_${currentAccountId}_client_id")
+	val oauthCallbackCode by settings.getStringOrNullFlow("oauth_callback")
 		.collectAsStateWithLifecycle(null)
 
 	fun continueButtonPressed() {
@@ -83,20 +84,20 @@ fun LoginView(
 
 		// todo: this blocking is annoying
 		runBlocking {
-			val existingAccounts = blockingSettings.getString("accounts", "")
+			val existingAccounts = settings.getString("accounts", "")
 			val accountId = "_S-${Uuid.random()}"
-			blockingSettings.putString("accounts", "$existingAccounts $accountId")
-			blockingSettings.putString("current_account", accountId)
-			blockingSettings.putString("account_${accountId}_host", host)
+			settings.putString("accounts", "$existingAccounts $accountId")
+			settings.putString("current_account", accountId)
+			settings.putString("account_${accountId}_host", host)
 
 			// get link you must visit to get token
 			val res = createApp()
 			if (res.error) return@runBlocking
 			if (res.response !is CreateAppResponse) return@runBlocking
 
-			blockingSettings.putString("account_${accountId}_token", "")
-			blockingSettings.putString("account_${accountId}_client_id", res.response.clientId)
-			blockingSettings.putString("account_${accountId}_client_secret", res.response.clientSecret)
+			settings.putString("account_${accountId}_token", "")
+			settings.putString("account_${accountId}_client_id", res.response.clientId)
+			settings.putString("account_${accountId}_client_secret", res.response.clientSecret)
 
 			continued = true
 
@@ -111,21 +112,22 @@ fun LoginView(
 	}
 
 	fun finishButtonPressed() {
-		runBlocking {
-			val res = createToken(oauthCallbackCode!!)
-			if (res.error) return@runBlocking
-			if (res.response !is OauthToken) return@runBlocking
+		val res = runBlocking { createToken(oauthCallbackCode!!) }
+		Logger.d { res.toString() }
+		blockingSettings.remove("oauth_callback")
 
-			blockingSettings.putString("account_${currentAccountId}_token", res.response.accessToken)
-			blockingSettings.putBoolean("logged_in", true)
+		if (res.error) return
+		if (res.response !is OauthToken) return
 
-			updateCurrentAccountObject()
-		}
+		blockingSettings.putString("account_${currentAccountId}_token", res.response.accessToken)
+		blockingSettings.putBoolean("logged_in", true)
+
+		runBlocking { updateCurrentAccountObject() }
 
 		navigateToTimeline()
 	}
 
-	if (oauthCallbackCode != "null" && oauthCallbackCode != null) {
+	if (!oauthCallbackCode.isNullOrBlank()) {
 		Logger.e("MEOW! CONTENT IS $oauthCallbackCode")
 		finishButtonPressed()
 	}
@@ -187,7 +189,7 @@ fun LoginView(
 			OutlinedButton(
 				modifier = Modifier
 					.padding(top = 20.dp),
-				onClick = { blockingSettings.clear(); setupAppSettings() },
+				onClick = { blockingSettings.clear(); blockingCache.clear(); setupAppSettings(); setupCache() },
 			) {
 				Text("Clear all data")
 			}
@@ -206,7 +208,6 @@ fun LoginView(
 				verticalArrangement = Arrangement.spacedBy(10.dp)
 			) {
 				CircularProgressIndicator()
-				Text("Logging in...")
 			}
 		}
 	}
