@@ -1,4 +1,4 @@
-package site.remlit.snowdrop.util
+package site.remlit.snowdrop.util.cache
 
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.coroutines.FlowSettings

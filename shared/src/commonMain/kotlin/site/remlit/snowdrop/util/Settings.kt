@@ -9,8 +9,9 @@ import com.russhwolf.settings.coroutines.toBlockingSettings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import site.remlit.snowdrop.api.verifyCredentials
-import site.remlit.snowdrop.model.User
-import site.remlit.snowdrop.util.config.json
+import site.remlit.snowdrop.model.Account
+import site.remlit.snowdrop.util.cache.getCacheEntry
+import site.remlit.snowdrop.util.cache.putCacheEntry
 
 @OptIn(ExperimentalSettingsApi::class)
 expect val settings: FlowSettings
@@ -50,8 +51,8 @@ fun setupAppSettings() {
  * @return User
  * */
 @OptIn(ExperimentalSettingsApi::class)
-fun getCurrentAccountObjectFlow(): Flow<User> = object : Flow<User> {
-	override suspend fun collect(collector: FlowCollector<User>) = safe {
+fun getCurrentAccountObjectFlow(): Flow<Account> = object : Flow<Account> {
+	override suspend fun collect(collector: FlowCollector<Account>) = safe {
 		if (getCurrentAccountId() == "")
 			return@safe
 
@@ -60,7 +61,7 @@ fun getCurrentAccountObjectFlow(): Flow<User> = object : Flow<User> {
 
 		collector.emit(
 			getCacheEntry("account_${getCurrentAccountId()}")!!
-				.getContent<User>()
+				.getContent<Account>()
 		)
 	}
 }
@@ -68,7 +69,7 @@ fun getCurrentAccountObjectFlow(): Flow<User> = object : Flow<User> {
 suspend fun updateCurrentAccountObject() {
 	val verifyRes = verifyCredentials()
 	if (verifyRes.error) return
-	if (verifyRes.response !is User) return
+	if (verifyRes.response !is Account) return
 
 	putCacheEntry(
 		"account_${getCurrentAccountId()}",

@@ -10,7 +10,7 @@ data class Notification(
 	val id: String,
 	val type: String,
 
-	val account: User,
+	val account: Account,
 	val status: Status? = null,
 
 	val emoji: String? = null,

@@ -20,10 +20,10 @@ import com.russhwolf.settings.ExperimentalSettingsApi
 import org.jetbrains.compose.resources.painterResource
 import site.remlit.snowdrop.component.ViewSurface
 import site.remlit.snowdrop.util.LocalNavController
-import site.remlit.snowdrop.util.blockingCache
+import site.remlit.snowdrop.util.cache.blockingCache
 import site.remlit.snowdrop.util.blockingSettings
-import site.remlit.snowdrop.util.getCacheEntry
-import site.remlit.snowdrop.util.getCacheManifest
+import site.remlit.snowdrop.util.cache.getCacheEntry
+import site.remlit.snowdrop.util.cache.getCacheManifest
 import site.remlit.snowdrop.util.settings
 import snowdrop.shared.generated.resources.Res
 import snowdrop.shared.generated.resources.icon_arrow_back_24

@@ -40,7 +40,7 @@ import site.remlit.snowdrop.ProfileRoute
 import site.remlit.snowdrop.ThreadRoute
 import site.remlit.snowdrop.component.dropdown.DangerDropdownItem
 import site.remlit.snowdrop.model.Status
-import site.remlit.snowdrop.model.User
+import site.remlit.snowdrop.model.Account
 import site.remlit.snowdrop.util.LocalNavController
 import site.remlit.snowdrop.util.WarningColor25
 import site.remlit.snowdrop.util.atRoute
@@ -86,7 +86,7 @@ fun Status(status: Status) {
 
 	var realStatus by remember { mutableStateOf(status) }
 	var isReblog by remember { mutableStateOf(false) }
-	var rebloggingAccount by remember { mutableStateOf<User?>(null) }
+	var rebloggingAccount by remember { mutableStateOf<Account?>(null) }
 	var isMine by remember { mutableStateOf(realStatus.account?.id == currentAccount?.id) }
 	//todo: or is admin? figure out how to do that
 

@@ -4,7 +4,7 @@ import com.russhwolf.settings.ExperimentalSettingsApi
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import site.remlit.snowdrop.model.ApiResponse
-import site.remlit.snowdrop.model.User
+import site.remlit.snowdrop.model.Account
 import site.remlit.snowdrop.util.config.endOfRequest
 import site.remlit.snowdrop.util.getCurrentAccountHost
 import site.remlit.snowdrop.util.getCurrentAccountId
@@ -13,7 +13,7 @@ import site.remlit.snowdrop.util.safeApiRequest
 import site.remlit.snowdrop.util.settings
 
 @OptIn(ExperimentalSettingsApi::class)
-suspend fun getAccount(id: String): ApiResponse<User> = safeApiRequest {
+suspend fun getAccount(id: String): ApiResponse<Account> = safeApiRequest {
 	val accountId = getCurrentAccountId()
 	val host = getCurrentAccountHost()
 	val token = settings.getString("account_${accountId}_token", "")

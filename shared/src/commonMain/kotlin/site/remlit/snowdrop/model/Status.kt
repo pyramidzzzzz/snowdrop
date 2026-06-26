@@ -8,7 +8,7 @@ import kotlin.time.Instant
 @Serializable
 data class Status(
 	val id: String? = null,
-	val account: User? = null,
+	val account: Account? = null,
 
 	@SerialName("spoiler_text")
 	val spoilerText: String? = null,
@@ -191,7 +191,7 @@ data class Status(
 		val url: String? = null,
 		@SerialName("static_url")
 		val staticUrl: String? = null,
-		val accounts: List<User>? = emptyList(),
+		val accounts: List<Account>? = emptyList(),
 		@SerialName("account_ids")
 		val accountIds: List<String> = emptyList()
 	)

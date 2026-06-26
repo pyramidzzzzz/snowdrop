@@ -50,7 +50,7 @@ import site.remlit.snowdrop.component.HtmlContent
 import site.remlit.snowdrop.component.ViewSurface
 import site.remlit.snowdrop.component.bigAvatarRadius
 import site.remlit.snowdrop.component.bigAvatarSize
-import site.remlit.snowdrop.model.User
+import site.remlit.snowdrop.model.Account
 import site.remlit.snowdrop.util.LocalNavController
 import site.remlit.snowdrop.util.atRoute
 import site.remlit.snowdrop.util.extension.formatNumber
@@ -75,7 +75,7 @@ fun ProfileView(id: String) = ViewSurface {
 	val currentAccount by getCurrentAccountObjectFlow()
 		.collectAsStateWithLifecycle(null)
 
-	var account by remember { mutableStateOf<User?>(null) }
+	var account by remember { mutableStateOf<Account?>(null) }
 	var ready by remember { mutableStateOf(false) }
 
 	var isMe by remember { mutableStateOf(false) }
@@ -193,7 +193,7 @@ fun ProfileView(id: String) = ViewSurface {
 									).height((bigAvatarSize + 6).dp)
 										.width((bigAvatarSize + 6).dp)
 								)
-								Avatar(user = account!!, big = true)
+								Avatar(account = account!!, big = true)
 							}
 
 							Row(

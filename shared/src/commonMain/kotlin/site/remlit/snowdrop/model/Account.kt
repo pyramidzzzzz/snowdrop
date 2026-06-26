@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class User(
+data class Account(
 	val id: String,
 	val username: String,
 	val acct: String,
@@ -37,7 +37,7 @@ data class User(
 	val headerDescription: String? = null,
 
 	// todo: why is this a string? what is this?
-	val moved: User? = null,
+	val moved: Account? = null,
 
 	val locked: Boolean,
 	val bot: Boolean,

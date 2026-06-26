@@ -55,7 +55,7 @@ import site.remlit.snowdrop.util.safe
 import site.remlit.snowdrop.util.scrollingUpward
 import site.remlit.snowdrop.util.settings
 import site.remlit.snowdrop.util.setupAppSettings
-import site.remlit.snowdrop.util.setupCache
+import site.remlit.snowdrop.util.cache.setupCache
 import site.remlit.snowdrop.view.*
 import site.remlit.snowdrop.view.settings.*
 import snowdrop.shared.generated.resources.Res

@@ -13,7 +13,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
-import site.remlit.snowdrop.model.User
+import site.remlit.snowdrop.model.Account
 
 const val bigAvatarSize = 84
 const val smallAvatarSize = 24
@@ -25,7 +25,7 @@ const val avatarRadius = 15
 
 @Composable
 fun Avatar(
-	user: User,
+	account: Account,
 	big: Boolean = false,
 	small: Boolean = false
 ) {
@@ -42,10 +42,10 @@ fun Avatar(
 		)
 	}
 
-	if (user.avatar != null) {
+	if (account.avatar != null) {
 		KamelImage(
-			{ asyncPainterResource(user.avatarStatic!!) },
-			user.avatarDescription,
+			{ asyncPainterResource(account.avatarStatic!!) },
+			account.avatarDescription,
 			onLoading = { fallback() },
 			modifier = Modifier.clip(RoundedCornerShape(radius))
 				.height(size)

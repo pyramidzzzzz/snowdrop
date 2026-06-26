@@ -1,11 +1,11 @@
 package site.remlit.snowdrop.model.response
 
 import kotlinx.serialization.Serializable
-import site.remlit.snowdrop.model.User
+import site.remlit.snowdrop.model.Account
 
 @Serializable
 data class SearchResponse(
-	val accounts: List<User> = emptyList(),
+	val accounts: List<Account> = emptyList(),
 	val statuses: List<String> = emptyList(),
 	val hashtags: List<Hashtag> = emptyList()
 ) {
