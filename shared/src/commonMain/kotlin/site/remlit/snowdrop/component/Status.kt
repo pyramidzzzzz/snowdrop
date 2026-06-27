@@ -104,7 +104,7 @@ fun Status(status: Status) {
 	var realStatus by remember { mutableStateOf(status) }
 	var isReblog by remember { mutableStateOf(false) }
 	var rebloggingAccount by remember { mutableStateOf<Account?>(null) }
-	var isMine by remember { mutableStateOf(realStatus.account?.id == currentAccount?.id) }
+	var isMine by remember { mutableStateOf(false) }
 	//todo: or is admin? figure out how to do that
 
 	if (status.reblog != null) {
@@ -112,6 +112,9 @@ fun Status(status: Status) {
 		isReblog = true
 		rebloggingAccount = status.account
 	}
+
+	if (realStatus.account?.id == currentAccount?.id)
+		isMine = true
 
 	var cwOpen by remember { mutableStateOf(false) }
 	var showDropdown by remember { mutableStateOf(false) }
@@ -145,7 +148,7 @@ fun Status(status: Status) {
 	Column(
 		modifier = Modifier.clickable(
 			enabled = !inThreadView || (inThreadView && !threadViewMainStatus),
-			onClick = { navHandler.navigate(ThreadRoute(realStatus.id!!)) }
+			onClick = { navHandler.navigate(ThreadRoute(realStatus.id)) }
 		).background(
 			if (threadViewMainStatus) MaterialTheme.colorScheme.surfaceContainerLow
 			else Color.Unspecified
