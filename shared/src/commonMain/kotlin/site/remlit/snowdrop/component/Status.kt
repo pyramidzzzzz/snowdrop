@@ -379,6 +379,9 @@ fun Status(status: Status) {
 				FooterButton(
 					onClick = {
 						bgIO {
+							if (!isMine && realStatus.visibility != "public" && realStatus.visibility != "unlisted")
+								return@bgIO
+
 							val res: ApiResponse<Status> = if (realStatus.reblogged) unreblogStatus(realStatus.id)
 							else reblogStatus(realStatus.id)
 							if (res.error || res.response == null) {
