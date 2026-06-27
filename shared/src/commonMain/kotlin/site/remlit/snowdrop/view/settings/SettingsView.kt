@@ -23,7 +23,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,29 +32,21 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.russhwolf.settings.ExperimentalSettingsApi
 import org.jetbrains.compose.resources.painterResource
-import site.remlit.snowdrop.SettingsDebugStorageRoute
+import site.remlit.snowdrop.DebugRoute
 import site.remlit.snowdrop.StartRoute
 import site.remlit.snowdrop.component.ViewSurface
 import site.remlit.snowdrop.component.Visibility
 import site.remlit.snowdrop.util.LocalNavController
-import site.remlit.snowdrop.util.bg
-import site.remlit.snowdrop.util.bgIO
 import site.remlit.snowdrop.util.blockingSettings
-import site.remlit.snowdrop.util.cache.cleanExpiredCacheEntries
-import site.remlit.snowdrop.util.cache.clearCacheEntries
-import site.remlit.snowdrop.util.determineFeatures
 import site.remlit.snowdrop.util.getCurrentAccountId
 import site.remlit.snowdrop.util.logoutAccount
-import site.remlit.snowdrop.util.resetFeatures
 import site.remlit.snowdrop.util.settings
 import snowdrop.shared.generated.resources.Res
 import snowdrop.shared.generated.resources.icon_arrow_back_24
 import snowdrop.shared.generated.resources.icon_chevron_right_24px
-import snowdrop.shared.generated.resources.icon_delete_24px
 import snowdrop.shared.generated.resources.icon_keyboard_arrow_down_24px
 import snowdrop.shared.generated.resources.icon_keyboard_arrow_up_24px
 import snowdrop.shared.generated.resources.icon_logout_24px
-import snowdrop.shared.generated.resources.icon_refresh_24px
 
 @Composable
 @OptIn(ExperimentalSettingsApi::class)
@@ -218,58 +209,24 @@ fun SettingsView() = ViewSurface {
 				)
 			}
 		}
-		item {
-			Text(
-				"Debug",
-				style = MaterialTheme.typography.labelLarge,
-				modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
-			)
-		}
+
 		item {
 			Card {
 				ListItem(
-					headlineContent = { Text("Storage") },
+					headlineContent = { Text("Debug") },
 					trailingContent = {
 						Icon(painterResource(Res.drawable.icon_chevron_right_24px), null)
 					},
 					modifier = Modifier.clickable {
-						navHandler.navigate(SettingsDebugStorageRoute(0))
+						navHandler.navigate(DebugRoute)
 					}
 				)
 			}
 		}
 		item {
-			Card {
-				ListItem(
-					headlineContent = { Text("Cache") },
-					supportingContent = { Text("May lag or crash app") },
-					trailingContent = {
-						Icon(painterResource(Res.drawable.icon_chevron_right_24px), null)
-					},
-					modifier = Modifier.clickable {
-						navHandler.navigate(SettingsDebugStorageRoute(1))
-					}
-				)
-			}
+			Divider()
 		}
-		item {
-			Card {
-				ListItem(
-					leadingContent = { Icon(painterResource(Res.drawable.icon_refresh_24px), null) },
-					headlineContent = { Text("Reset feature determinations") },
-					modifier = Modifier.clickable { resetFeatures(); bgIO { determineFeatures() } }
-				)
-			}
-		}
-		item {
-			Card {
-				ListItem(
-					leadingContent = { Icon(painterResource(Res.drawable.icon_refresh_24px), null) },
-					headlineContent = { Text("Clear cache") },
-					modifier = Modifier.clickable { bg { clearCacheEntries() } }
-				)
-			}
-		}
+
 		item {
 			Card {
 				ListItem(

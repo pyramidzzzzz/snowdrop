@@ -133,8 +133,6 @@ fun Notification(notification: Notification) {
 								else "bit you"
 						}
 
-						val timestamp = "${notification.getCreatedAtTimestamp()?.toRelativeString()}"
-
 						/*
 						* Actually render the link and style it and all that stuff
 						*/
@@ -172,6 +170,8 @@ fun Notification(notification: Notification) {
 							modifier = Modifier.weight(1f),
 							lineHeight = with(LocalDensity.current) { smallerAvatarSize.dp.toSp() }
 						)
+
+						val timestamp = "${notification.getCreatedAtTimestamp()?.toRelativeString()}"
 
 						Text(
 							text = timestamp,

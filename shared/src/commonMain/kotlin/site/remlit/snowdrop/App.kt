@@ -7,11 +7,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -38,7 +34,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -73,6 +68,8 @@ import site.remlit.snowdrop.util.cache.setupCache
 import site.remlit.snowdrop.util.getAccounts
 import site.remlit.snowdrop.util.safeReturnable
 import site.remlit.snowdrop.view.*
+import site.remlit.snowdrop.view.debug.DebugView
+import site.remlit.snowdrop.view.debug.DebugStorageView
 import site.remlit.snowdrop.view.settings.*
 import snowdrop.shared.generated.resources.Res
 import snowdrop.shared.generated.resources.icon_account_circle_24px
@@ -104,12 +101,19 @@ data class ProfileRoute(val id: String) : Destination(6)
 @Serializable
 data class ThreadRoute(val id: String) : Destination(7)
 @Serializable
-object ComposeRoute : Destination(8)
+data class ComposeRoute(
+	val inReplyToId: String? = null,
+	val cw: String = "",
+	val content: String = ""
+) : Destination(8)
 
 @Serializable
 object SettingsRoute : Destination(100)
+
 @Serializable
-data class SettingsDebugStorageRoute(val storage: Int) : Destination(101)
+object DebugRoute : Destination(1000)
+@Serializable
+data class DebugStorageRoute(val storage: Int) : Destination(1001)
 
 
 @Composable
@@ -154,10 +158,10 @@ fun App() = safe {
 
 
 	fun shouldHideBottomBar(): Boolean =
-		atRoute<ProfileRoute>(currentDest) ||
-			atRoute<ComposeRoute>(currentDest) ||
+		atRoute<ComposeRoute>(currentDest) ||
 			atRoute<SettingsRoute>(currentDest) ||
-			atRoute<SettingsDebugStorageRoute>(currentDest)
+			atRoute<DebugRoute>(currentDest) ||
+			atRoute<DebugStorageRoute>(currentDest)
 
 	fun shouldShowComposeFab(): Boolean =
 		loggedIn == true &&
@@ -323,13 +327,23 @@ fun App() = safe {
 									ProfileView(args.id)
 								}
 
-								composable<ComposeRoute> { ComposeView() }
+								composable<ComposeRoute> {
+									val args = it.toRoute<ComposeRoute>()
+									ComposeView(
+										args.inReplyToId,
+										args.cw,
+										args.content
+									)
+								}
 
 								// Settings
 								composable<SettingsRoute> { SettingsView() }
-								composable<SettingsDebugStorageRoute> {
-									val args = it.toRoute<SettingsDebugStorageRoute>()
-									SettingsDebugStorageView(args.storage)
+
+								// Debug
+								composable<DebugRoute> { DebugView() }
+								composable<DebugStorageRoute> {
+									val args = it.toRoute<DebugStorageRoute>()
+									DebugStorageView(args.storage)
 								}
 							}
 						}

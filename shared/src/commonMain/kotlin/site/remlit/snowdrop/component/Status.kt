@@ -483,6 +483,24 @@ fun Status(status: Status) {
 							)
 						}
 
+						if (realStatus.bookmarked) {
+							DropdownMenuItem(
+								text = { Text("Unbookmark") },
+								leadingIcon = {
+									Icon(painterResource(Res.drawable.icon_bookmark_filled_24px), null)
+								},
+								onClick = { }
+							)
+						} else {
+							DropdownMenuItem(
+								text = { Text("Bookmark") },
+								leadingIcon = {
+									Icon(painterResource(Res.drawable.icon_bookmark_24px), null)
+								},
+								onClick = { }
+							)
+						}
+
 						HorizontalDivider()
 
 						DropdownMenuItem(
@@ -501,25 +519,16 @@ fun Status(status: Status) {
 							onClick = { }
 						)
 
-						HorizontalDivider()
+						if (getFeature("reactions"))
+							DropdownMenuItem(
+								text = { Text("Show reactions") },
+								leadingIcon = {
+									Icon(painterResource(Res.drawable.icon_star_24px), null)
+								},
+								onClick = { }
+							)
 
-						if (realStatus.bookmarked) {
-							DropdownMenuItem(
-								text = { Text("Unbookmark") },
-								leadingIcon = {
-									Icon(painterResource(Res.drawable.icon_bookmark_filled_24px), null)
-								},
-								onClick = { }
-							)
-						} else {
-							DropdownMenuItem(
-								text = { Text("Bookmark") },
-								leadingIcon = {
-									Icon(painterResource(Res.drawable.icon_bookmark_24px), null)
-								},
-								onClick = { }
-							)
-						}
+						HorizontalDivider()
 
 						DropdownMenuItem(
 							text = { Text("Mute") },

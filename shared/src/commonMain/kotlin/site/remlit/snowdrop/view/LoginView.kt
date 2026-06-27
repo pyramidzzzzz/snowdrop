@@ -33,6 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.touchlab.kermit.Logger
 import com.russhwolf.settings.ExperimentalSettingsApi
 import kotlinx.coroutines.runBlocking
+import site.remlit.snowdrop.DebugRoute
 import site.remlit.snowdrop.api.oauth.authScopes
 import site.remlit.snowdrop.api.oauth.createApp
 import site.remlit.snowdrop.api.oauth.createToken
@@ -40,6 +41,7 @@ import site.remlit.snowdrop.api.oauth.redirectUri
 import site.remlit.snowdrop.component.ViewSurface
 import site.remlit.snowdrop.model.response.CreateAppResponse
 import site.remlit.snowdrop.model.response.OauthToken
+import site.remlit.snowdrop.util.LocalNavController
 import site.remlit.snowdrop.util.bg
 import site.remlit.snowdrop.util.bgIO
 import site.remlit.snowdrop.util.blockingSettings
@@ -56,6 +58,7 @@ import kotlin.uuid.Uuid
 fun LoginView(
 	navigateToTimeline: () -> Unit
 ) = ViewSurface {
+	val navController = LocalNavController.current
 	val uriHandler = LocalUriHandler.current
 
 
@@ -190,12 +193,12 @@ fun LoginView(
 				else Text("Continue")
 			}
 
-			OutlinedButton(
+			TextButton(
 				modifier = Modifier
 					.padding(top = 20.dp),
-				onClick = { blockingSettings.clear(); blockingCache.clear(); setupAppSettings(); setupCache() },
+				onClick = { navController.navigate(DebugRoute) },
 			) {
-				Text("Clear all data")
+				Text("Debug")
 			}
 		}
 	} else {

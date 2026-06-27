@@ -61,7 +61,11 @@ import snowdrop.shared.generated.resources.icon_send_24px
 
 @Composable
 @OptIn(ExperimentalSettingsApi::class)
-fun ComposeView() = ViewSurface {
+fun ComposeView(
+	inReplyToId: String? = null,
+	initialCw: String = "",
+	initialContent: String = ""
+) = ViewSurface {
 	val navHandler = LocalNavController.current
 
 	val currentAccount by getCurrentAccountObjectFlow()
@@ -69,8 +73,8 @@ fun ComposeView() = ViewSurface {
 
 	var visibilityDropdownOpen by remember { mutableStateOf(false) }
 
-	var cw by remember { mutableStateOf("") }
-	var content by remember { mutableStateOf("") }
+	var cw by remember { mutableStateOf(initialCw) }
+	var content by remember { mutableStateOf(initialContent) }
 	var visibility by remember { mutableStateOf(blockingSettings.getString("default_visibility", "public")) }
 
 

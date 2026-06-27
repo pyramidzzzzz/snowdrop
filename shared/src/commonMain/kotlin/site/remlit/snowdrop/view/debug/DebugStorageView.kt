@@ -1,4 +1,4 @@
-package site.remlit.snowdrop.view.settings
+package site.remlit.snowdrop.view.debug
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,7 +30,7 @@ import snowdrop.shared.generated.resources.icon_arrow_back_24
 
 @OptIn(ExperimentalSettingsApi::class)
 @Composable
-fun SettingsDebugStorageView(
+fun DebugStorageView(
 	storage: Int = 0
 ) = ViewSurface {
 	val navHandler = LocalNavController.current

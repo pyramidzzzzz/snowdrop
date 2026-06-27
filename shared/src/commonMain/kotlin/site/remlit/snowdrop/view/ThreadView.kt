@@ -9,6 +9,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -23,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.Dispatchers
+import org.jetbrains.compose.resources.painterResource
 import site.remlit.snowdrop.api.statuses.getStatus
 import site.remlit.snowdrop.api.statuses.getStatusContext
 import site.remlit.snowdrop.api.timeline.getHomeTimeline
@@ -30,12 +33,17 @@ import site.remlit.snowdrop.component.Status
 import site.remlit.snowdrop.component.ViewSurface
 import site.remlit.snowdrop.model.Status
 import site.remlit.snowdrop.model.StatusContext
+import site.remlit.snowdrop.util.LocalNavController
 import site.remlit.snowdrop.util.cache.fetchStatus
 import site.remlit.snowdrop.util.getCurrentAccountObjectFlow
+import snowdrop.shared.generated.resources.Res
+import snowdrop.shared.generated.resources.icon_arrow_back_24
 import site.remlit.snowdrop.component.Status as StatusComponent
 
 @Composable
 fun ThreadView(id: String) = ViewSurface {
+	val navHandler = LocalNavController.current
+
 	val currentAccount by getCurrentAccountObjectFlow()
 		.collectAsStateWithLifecycle(null)
 
@@ -64,6 +72,11 @@ fun ThreadView(id: String) = ViewSurface {
 	}
 
 	TopAppBar(
+		navigationIcon = {
+			IconButton(onClick = { navHandler.popBackStack() }) {
+				Icon(painterResource(Res.drawable.icon_arrow_back_24), null)
+			}
+		},
 		title = {
 			if (status == null) Column {
 				Text("Post")
