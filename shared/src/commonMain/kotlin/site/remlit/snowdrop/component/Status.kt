@@ -45,14 +45,21 @@ import com.russhwolf.settings.ExperimentalSettingsApi
 import org.jetbrains.compose.resources.painterResource
 import site.remlit.snowdrop.ProfileRoute
 import site.remlit.snowdrop.ThreadRoute
+import site.remlit.snowdrop.api.statuses.favouriteStatus
+import site.remlit.snowdrop.api.statuses.reblogStatus
+import site.remlit.snowdrop.api.statuses.unfavouriteStatus
+import site.remlit.snowdrop.api.statuses.unreblogStatus
 import site.remlit.snowdrop.component.dropdown.DangerDropdownItem
 import site.remlit.snowdrop.model.Status
 import site.remlit.snowdrop.model.Account
+import site.remlit.snowdrop.model.ApiResponse
 import site.remlit.snowdrop.util.BoostColor
 import site.remlit.snowdrop.util.LikeColor
 import site.remlit.snowdrop.util.LocalNavController
+import site.remlit.snowdrop.util.SnackbarController
 import site.remlit.snowdrop.util.WarningColor25
 import site.remlit.snowdrop.util.atRoute
+import site.remlit.snowdrop.util.bgIO
 import site.remlit.snowdrop.util.getCurrentAccountObjectFlow
 import site.remlit.snowdrop.util.settings
 import site.remlit.snowdrop.util.extension.toFormatShort
@@ -82,6 +89,7 @@ import snowdrop.shared.generated.resources.icon_warning_24px
 fun Status(status: Status) {
 	val navHandler = LocalNavController.current
 	val currentDest = navHandler.currentDestination
+	val snackbarController = SnackbarController.current
 	// TODO: update to LocalClipboard when this issue is resolved https://youtrack.jetbrains.com/issue/CMP-7624
 	val clipboardManager = LocalClipboardManager.current
 	val uriHandler = LocalUriHandler.current
@@ -369,7 +377,17 @@ fun Status(status: Status) {
 				}
 
 				FooterButton(
-					onClick = { },
+					onClick = {
+						bgIO {
+							val res: ApiResponse<Status> = if (realStatus.reblogged) unreblogStatus(realStatus.id)
+							else reblogStatus(realStatus.id)
+							if (res.error || res.response == null) {
+								res.handleError(snackbarController)
+								return@bgIO
+							}
+							realStatus = res.response
+						}
+					},
 					colors = if (realStatus.reblogged) ButtonDefaults.textButtonColors(
 						contentColor = BoostColor
 					) else null
@@ -395,7 +413,17 @@ fun Status(status: Status) {
 				}
 
 				FooterButton(
-					onClick = { },
+					onClick = {
+						bgIO {
+							val res: ApiResponse<Status> = if (realStatus.favourited) unfavouriteStatus(realStatus.id)
+							else favouriteStatus(realStatus.id)
+							if (res.error || res.response == null) {
+								res.handleError(snackbarController)
+								return@bgIO
+							}
+							realStatus = res.response
+						}
+					},
 					colors = if (realStatus.favourited) ButtonDefaults.textButtonColors(
 						contentColor = LikeColor
 					) else null

@@ -28,3 +28,10 @@ suspend inline fun <reified T> endOfRequest(req: HttpResponse): T {
 	}
 	return body
 }
+
+suspend fun endOfRequestNoBody(req: HttpResponse) {
+	if (!req.status.isSuccess())
+		throw ApiException("${req.status.value} - ${req.request.url}" +
+			"\nBody: ${req.bodyAsText()}")
+}
+
