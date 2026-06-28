@@ -380,7 +380,10 @@ fun App() = safe {
 
 									TextButton(
 										modifier = Modifier.padding(all = 10.dp).fillMaxWidth(),
-										onClick = { addNewAccount(navController) }
+										onClick = {
+											showAccountSwitcher = false
+											addNewAccount(navController)
+										}
 									) {
 										Icon(painterResource(Res.drawable.icon_add_24px), null)
 										Text("Add account")
