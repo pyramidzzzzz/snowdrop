@@ -1,5 +1,8 @@
 package site.remlit.snowdrop.util
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import co.touchlab.kermit.Logger
 import site.remlit.snowdrop.api.getInstance
 
@@ -15,10 +18,16 @@ enum class Software {
 }
 
 /**
+ * If determineFeatures() is actively running.
+ * */
+var determiningFeatures by mutableStateOf(false)
+
+/**
  * Object of mutable states which advertise the current supported
  * features of the logged in account.
  * */
 suspend fun determineFeatures() {
+	determiningFeatures = true
 	var software = Software.Mastodon
 
 	val res = getInstance(auth = true)
@@ -59,6 +68,8 @@ suspend fun determineFeatures() {
 		software == Software.IceshrimpNET
 	) putFeature("reactions", true)
 	else putFeature("reactions", false)
+
+	determiningFeatures = false
 }
 
 fun resetFeatures() = blockingSettings.keys.filter {
@@ -77,7 +88,7 @@ fun getFeature(feature: String): Boolean {
 	)
 
 	// feature set may have updated, so check again!
-	if (enabled == null) bgIO { determineFeatures() }
+	if (enabled == null && !determiningFeatures) bgIO { determineFeatures() }
 
 	return enabled ?: false
 }
