@@ -78,6 +78,7 @@ import snowdrop.shared.generated.resources.icon_flag_24px
 import snowdrop.shared.generated.resources.icon_image_24
 import snowdrop.shared.generated.resources.icon_link_24px
 import snowdrop.shared.generated.resources.icon_lock_24px
+import snowdrop.shared.generated.resources.icon_mood_24px
 import snowdrop.shared.generated.resources.icon_more_horiz_24px
 import snowdrop.shared.generated.resources.icon_open_in_new_24px
 import snowdrop.shared.generated.resources.icon_repeat_24px
@@ -530,7 +531,7 @@ fun Status(status: Status) {
 							DropdownMenuItem(
 								text = { Text("Show reactions") },
 								leadingIcon = {
-									Icon(painterResource(Res.drawable.icon_star_24px), null)
+									Icon(painterResource(Res.drawable.icon_mood_24px), null)
 								},
 								onClick = {
 									navHandler.navigate(StatusInteractionDetailRoute(realStatus.id, InteractionViewType.Reaction))

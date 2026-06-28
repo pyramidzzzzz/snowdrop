@@ -41,12 +41,15 @@ import site.remlit.snowdrop.util.blockingSettings
 import site.remlit.snowdrop.util.getCurrentAccountId
 import site.remlit.snowdrop.util.logoutAccount
 import site.remlit.snowdrop.util.settings
+import site.remlit.snowdrop.util.showAccountSwitcher
 import snowdrop.shared.generated.resources.Res
 import snowdrop.shared.generated.resources.icon_arrow_back_24
+import snowdrop.shared.generated.resources.icon_bug_report_24px
 import snowdrop.shared.generated.resources.icon_chevron_right_24px
 import snowdrop.shared.generated.resources.icon_keyboard_arrow_down_24px
 import snowdrop.shared.generated.resources.icon_keyboard_arrow_up_24px
 import snowdrop.shared.generated.resources.icon_logout_24px
+import snowdrop.shared.generated.resources.icon_switch_account_24px
 
 @Composable
 @OptIn(ExperimentalSettingsApi::class)
@@ -213,6 +216,9 @@ fun SettingsView() = ViewSurface {
 		item {
 			Card {
 				ListItem(
+					leadingContent = {
+						Icon(painterResource(Res.drawable.icon_bug_report_24px), null,)
+					},
 					headlineContent = { Text("Debug") },
 					trailingContent = {
 						Icon(painterResource(Res.drawable.icon_chevron_right_24px), null)
@@ -223,10 +229,27 @@ fun SettingsView() = ViewSurface {
 				)
 			}
 		}
-		item {
-			Divider()
-		}
 
+		item {
+			Text(
+				"Account",
+				style = MaterialTheme.typography.labelLarge,
+				modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
+			)
+		}
+		item {
+			Card {
+				ListItem(
+					leadingContent = {
+						Icon(painterResource(Res.drawable.icon_switch_account_24px), null,)
+					},
+					headlineContent = { Text("Switch account") },
+					modifier = Modifier.clickable {
+						showAccountSwitcher = true
+					}
+				)
+			}
+		}
 		item {
 			Card {
 				ListItem(

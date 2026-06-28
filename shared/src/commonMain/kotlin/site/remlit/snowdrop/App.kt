@@ -7,17 +7,27 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -25,6 +35,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -34,6 +45,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -52,12 +65,15 @@ import io.ktor.http.Url
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.painterResource
 import site.remlit.snowdrop.component.AppTheme
+import site.remlit.snowdrop.component.Avatar
 import site.remlit.snowdrop.model.ui.Destination
 import site.remlit.snowdrop.util.ExternalUriHandler
 import site.remlit.snowdrop.util.LocalNavController
 import site.remlit.snowdrop.util.SnackbarController
+import site.remlit.snowdrop.util.addNewAccount
 import site.remlit.snowdrop.util.atRoute
 import site.remlit.snowdrop.util.blockingSettings
+import site.remlit.snowdrop.util.cache.getCacheEntry
 import site.remlit.snowdrop.util.getCurrentAccountObjectFlow
 import site.remlit.snowdrop.util.config.kamelConfig
 import site.remlit.snowdrop.util.safe
@@ -65,8 +81,12 @@ import site.remlit.snowdrop.util.scrollingUpward
 import site.remlit.snowdrop.util.settings
 import site.remlit.snowdrop.util.setupAppSettings
 import site.remlit.snowdrop.util.cache.setupCache
+import site.remlit.snowdrop.util.getAccountObjectFlow
 import site.remlit.snowdrop.util.getAccounts
+import site.remlit.snowdrop.util.getCurrentAccountId
 import site.remlit.snowdrop.util.safeReturnable
+import site.remlit.snowdrop.util.showAccountSwitcher
+import site.remlit.snowdrop.util.switchAccount
 import site.remlit.snowdrop.view.*
 import site.remlit.snowdrop.view.debug.DebugView
 import site.remlit.snowdrop.view.debug.DebugStorageView
@@ -74,6 +94,7 @@ import site.remlit.snowdrop.view.settings.*
 import snowdrop.shared.generated.resources.Res
 import snowdrop.shared.generated.resources.icon_account_circle_24px
 import snowdrop.shared.generated.resources.icon_account_circle_filled_24px
+import snowdrop.shared.generated.resources.icon_add_24px
 import snowdrop.shared.generated.resources.icon_alternate_email_24px
 import snowdrop.shared.generated.resources.icon_edit_square_24px
 import snowdrop.shared.generated.resources.icon_explore_24px
@@ -144,7 +165,6 @@ fun App() = safe {
 		.collectAsStateWithLifecycle(null)
 	val account by getCurrentAccountObjectFlow()
 		.collectAsStateWithLifecycle(null)
-	var showAccountSwitcher by remember { mutableStateOf(false) }
 
 
 	DisposableEffect(Unit) {
@@ -285,13 +305,52 @@ fun App() = safe {
 								ModalBottomSheet(
 									onDismissRequest = { showAccountSwitcher = false }
 								) {
+									// todo: redesign this. cards look bad!
 									getAccounts().forEach { it ->
-										Card(
-											modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 10.dp)
-												.fillMaxWidth()
-										) {
-											Text(it)
+										val account by getAccountObjectFlow(it)
+											.collectAsStateWithLifecycle(null)
+
+										if (account != null) {
+											Card(
+												modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 5.dp)
+													.clip(RoundedCornerShape(10.dp))
+													.fillMaxWidth()
+													.clickable {
+														switchAccount(it, navController)
+													},
+												colors = CardDefaults.cardColors(
+													containerColor = if (getCurrentAccountId() == it)
+															MaterialTheme.colorScheme.secondaryContainer
+														else MaterialTheme.colorScheme.surfaceContainerLow,
+													contentColor = if (getCurrentAccountId() == it)
+															MaterialTheme.colorScheme.onPrimaryContainer
+														else MaterialTheme.colorScheme.onSurface,
+												)
+											) {
+												Row(
+													modifier = Modifier.padding(10.dp),
+													horizontalArrangement = Arrangement.spacedBy(10.dp)
+												) {
+													Avatar(account!!)
+
+													Column {
+														Text(
+															account!!.displayName ?: account!!.url,
+															fontWeight = FontWeight.Medium
+														)
+														Text("@${account!!.acct}")
+													}
+												}
+											}
 										}
+									}
+
+									TextButton(
+										modifier = Modifier.padding(all = 10.dp).fillMaxWidth(),
+										onClick = { addNewAccount(navController) }
+									) {
+										Icon(painterResource(Res.drawable.icon_add_24px), null)
+										Text("Add account")
 									}
 								}
 

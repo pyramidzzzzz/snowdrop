@@ -122,23 +122,25 @@ fun StatusInteractionDetailView(
 			}
 
 			// todo: scrolling
-			PrimaryScrollableTabRow(currentTab) {
-				reactions.forEach {
-					val i = reactions.indexOf(it)
-					Tab(
-						selected = currentTab == i,
-						onClick = { currentTab = i },
-						text = {
-							if (it.url != null) {
-								Emoji(Emoji(it.name, it.staticUrl ?: it.url, it.url))
-							} else Text(it.name)
-						}
-					)
+			if (!reactions.isEmpty()) {
+				PrimaryScrollableTabRow(currentTab) {
+					reactions.forEach {
+						val i = reactions.indexOf(it)
+						Tab(
+							selected = currentTab == i,
+							onClick = { currentTab = i },
+							text = {
+								if (it.url != null) {
+									Emoji(Emoji(it.name, it.staticUrl ?: it.url, it.url))
+								} else Text(it.name)
+							}
+						)
+					}
 				}
-			}
-			LazyColumn {
-				reactions.filter { reactions.indexOf(it) == currentTab }.forEach { reaction ->
-					item { AccountRow(reaction.account) }
+				LazyColumn {
+					reactions.filter { reactions.indexOf(it) == currentTab }.forEach { reaction ->
+						item { AccountRow(reaction.account) }
+					}
 				}
 			}
 		}

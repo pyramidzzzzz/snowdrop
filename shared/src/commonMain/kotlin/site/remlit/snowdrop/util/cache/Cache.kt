@@ -44,6 +44,13 @@ fun getCacheEntry(id: String): CacheEntry? {
 }
 
 @OptIn(ExperimentalSerializationApi::class)
+fun getCacheEntry(accountId: String, id: String): CacheEntry? {
+	val raw = blockingCache.getStringOrNull("${accountId}_entry_$id")
+		?: return null
+	return cbor.decodeFromHexString(raw)
+}
+
+@OptIn(ExperimentalSerializationApi::class)
 inline fun <reified T> putCacheEntry(
 	id: String,
 	content: T
