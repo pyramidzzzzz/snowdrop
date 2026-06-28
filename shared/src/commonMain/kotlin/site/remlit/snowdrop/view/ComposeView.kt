@@ -63,6 +63,7 @@ import site.remlit.snowdrop.util.cache.fetchStatus
 import site.remlit.snowdrop.util.cache.fetchStatusOrNull
 import site.remlit.snowdrop.util.getCurrentAccountObjectFlow
 import site.remlit.snowdrop.util.settings
+import site.remlit.snowdrop.util.showAccountSwitcher
 import snowdrop.shared.generated.resources.Res
 import snowdrop.shared.generated.resources.icon_close_24px
 import snowdrop.shared.generated.resources.icon_globe_20px
@@ -70,6 +71,7 @@ import snowdrop.shared.generated.resources.icon_home_20px
 import snowdrop.shared.generated.resources.icon_lock_20px
 import snowdrop.shared.generated.resources.icon_mail_20px
 import snowdrop.shared.generated.resources.icon_send_24px
+import snowdrop.shared.generated.resources.icon_swap_horiz_24px
 import snowdrop.shared.generated.resources.icon_warning_24px
 
 @Composable
@@ -167,6 +169,7 @@ fun ComposeView(
 							Visibility(visibility, true)
 						}
 
+						// Visibility picker
 						DropdownMenu(
 							expanded = visibilityDropdownOpen,
 							onDismissRequest = { visibilityDropdownOpen = !visibilityDropdownOpen }
@@ -311,7 +314,7 @@ fun ComposeView(
 					.imePadding(),
 				verticalAlignment = Alignment.CenterVertically
 			) {
-				TextButton(onClick = { showCwField = !showCwField }) {
+				IconButton(onClick = { showCwField = !showCwField }) {
 					Icon(painterResource(Res.drawable.icon_warning_24px), null)
 				}
 

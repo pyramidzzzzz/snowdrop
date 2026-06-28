@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,13 +34,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.painterResource
 import site.remlit.snowdrop.ProfileRoute
+import site.remlit.snowdrop.api.followRequest.authorizeFollowRequest
+import site.remlit.snowdrop.api.followRequest.rejectFollowRequest
 import site.remlit.snowdrop.model.Notification
 import site.remlit.snowdrop.util.LocalNavController
+import site.remlit.snowdrop.util.bgIO
 import site.remlit.snowdrop.util.extension.toRelativeString
 import snowdrop.shared.generated.resources.Res
 import snowdrop.shared.generated.resources.icon_add_24px
+import snowdrop.shared.generated.resources.icon_check_24px
+import snowdrop.shared.generated.resources.icon_close_24px
 import snowdrop.shared.generated.resources.icon_edit_24px
 import snowdrop.shared.generated.resources.icon_notifications_active_24
+import snowdrop.shared.generated.resources.icon_person_add_24px
 import snowdrop.shared.generated.resources.icon_repeat_24px
 import snowdrop.shared.generated.resources.icon_poll_24px
 import snowdrop.shared.generated.resources.icon_star_24px
@@ -96,6 +104,14 @@ fun Notification(notification: Notification) {
 							painterResource(Res.drawable.icon_tooth_24px), null,
 							tint = MaterialTheme.colorScheme.primary
 						)
+						"follow_request" -> Icon(
+							painterResource(Res.drawable.icon_person_add_24px), null,
+							tint = MaterialTheme.colorScheme.primary
+						)
+						"follow" -> Icon(
+							painterResource(Res.drawable.icon_person_add_24px), null,
+							tint = MaterialTheme.colorScheme.primary
+						)
 					}
 
 					Row(
@@ -115,9 +131,10 @@ fun Notification(notification: Notification) {
 						var message by remember { mutableStateOf("") }
 
 						when (notification.type) {
-							"favourite", "pleroma:emoji_reaction", "reaction", "reblog", "update", "status", "bite" ->
-								displayName = notification.account.displayName
-									?: notification.account.username
+							"favourite", "pleroma:emoji_reaction", "reaction", "reblog", "update", "status", "bite",
+								"follow_request", "follow" ->
+									displayName = notification.account.displayName
+										?: notification.account.username
 						}
 
 						when (notification.type) {
@@ -131,6 +148,8 @@ fun Notification(notification: Notification) {
 							"bite" -> message = if (notification.bite?.biteBack == true) "bit you back"
 								else if (notification.status != null) "bit your post"
 								else "bit you"
+							"follow_request" -> message = "requested to follow you"
+							"follow" -> message = "followed you"
 						}
 
 						/*
@@ -186,6 +205,22 @@ fun Notification(notification: Notification) {
 						modifier = Modifier.padding(top = 10.dp)
 					) {
 						MiniStatus(notification.status)
+					}
+				}
+
+				if (notification.type == "follow_request") {
+					Row(
+						modifier = Modifier.padding(top = 10.dp),
+						horizontalArrangement = Arrangement.spacedBy(10.dp)
+					) {
+						FilledTonalButton(onClick = { bgIO { authorizeFollowRequest(notification.account.id) } }) {
+							Icon(painterResource(Res.drawable.icon_check_24px), null)
+							Text("Accept")
+						}
+						OutlinedButton(onClick = { bgIO { rejectFollowRequest(notification.account.id) } }) {
+							Icon(painterResource(Res.drawable.icon_close_24px), null)
+							Text("Reject")
+						}
 					}
 				}
 			}

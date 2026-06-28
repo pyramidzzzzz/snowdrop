@@ -105,6 +105,9 @@ import snowdrop.shared.generated.resources.icon_notifications_filled_24px
 import kotlin.time.Duration.Companion.milliseconds
 
 
+/*
+* NOTE: Only primitive types are allowed in the route data class values.
+* */
 @Serializable
 object StartRoute
 @Serializable
@@ -121,10 +124,13 @@ object MyProfileRoute
 data class ProfileRoute(val id: String)
 @Serializable
 data class ThreadRoute(val id: String)
+/**
+ * @param type [site.remlit.snowdrop.view.InteractionViewType] as a string
+ * */
 @Serializable
 data class StatusInteractionDetailRoute(
 	val id: String,
-	val type: InteractionViewType
+	val type: String
 )
 @Serializable
 data class ComposeRoute(
@@ -360,7 +366,7 @@ fun App() = safe {
 												) {
 													Avatar(account!!)
 
-													Column {
+													Column(verticalArrangement = Arrangement.Center) {
 														Text(
 															account!!.displayName ?: account!!.url,
 															fontWeight = FontWeight.Medium
@@ -415,7 +421,7 @@ fun App() = safe {
 								}
 								composable<StatusInteractionDetailRoute> {
 									val args = it.toRoute<StatusInteractionDetailRoute>()
-									StatusInteractionDetailView(args.id, args.type)
+									StatusInteractionDetailView(args.id, InteractionViewType.valueOf(args.type))
 								}
 								composable<ProfileRoute> {
 									val args = it.toRoute<ProfileRoute>()

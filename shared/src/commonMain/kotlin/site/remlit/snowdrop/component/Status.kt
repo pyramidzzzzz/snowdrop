@@ -376,7 +376,8 @@ fun Status(status: Status) {
 						cw = if (!realStatus.spoilerText.isNullOrBlank()) "RE: ${realStatus.spoilerText}" else "",
 						// what a block
 						content = (if (!isMine) "@${realStatus.account!!.acct} " else "") +
-							realStatus.mentions.joinToString(separator = "") { "@${it.acct} " }
+							realStatus.mentions.joinToString(separator = "") { "@${it.acct} " },
+						visibility = realStatus.visibility
 					))
 				}) {
 					if (realStatus.inReplyToId != null) Icon(
@@ -532,7 +533,7 @@ fun Status(status: Status) {
 								Icon(painterResource(Res.drawable.icon_repeat_24px), null)
 							},
 							onClick = {
-								navHandler.navigate(StatusInteractionDetailRoute(realStatus.id, InteractionViewType.Boost))
+								navHandler.navigate(StatusInteractionDetailRoute(realStatus.id, InteractionViewType.Boost.toString()))
 							}
 						)
 
@@ -542,7 +543,7 @@ fun Status(status: Status) {
 								Icon(painterResource(Res.drawable.icon_star_24px), null)
 							},
 							onClick = {
-								navHandler.navigate(StatusInteractionDetailRoute(realStatus.id, InteractionViewType.Like))
+								navHandler.navigate(StatusInteractionDetailRoute(realStatus.id, InteractionViewType.Like.toString()))
 							}
 						)
 
@@ -553,7 +554,7 @@ fun Status(status: Status) {
 									Icon(painterResource(Res.drawable.icon_mood_24px), null)
 								},
 								onClick = {
-									navHandler.navigate(StatusInteractionDetailRoute(realStatus.id, InteractionViewType.Reaction))
+									navHandler.navigate(StatusInteractionDetailRoute(realStatus.id, InteractionViewType.Reaction.toString()))
 								}
 							)
 
