@@ -67,7 +67,6 @@ import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.painterResource
 import site.remlit.snowdrop.component.AppTheme
 import site.remlit.snowdrop.component.Avatar
-import site.remlit.snowdrop.model.ui.Destination
 import site.remlit.snowdrop.util.ExternalUriHandler
 import site.remlit.snowdrop.util.LocalNavController
 import site.remlit.snowdrop.util.SnackbarController
@@ -107,40 +106,40 @@ import kotlin.time.Duration.Companion.milliseconds
 
 
 @Serializable
-object StartRoute : Destination(0)
+object StartRoute
 @Serializable
-object LoginRoute : Destination(1)
+object LoginRoute
 @Serializable
-object TimelineRoute : Destination(2)
+object TimelineRoute
 @Serializable
-object NotificationsRoute : Destination(3)
+object NotificationsRoute
 @Serializable
-object ExploreRoute : Destination(4)
+object ExploreRoute
 @Serializable
-object MyProfileRoute : Destination(5)
+object MyProfileRoute
 @Serializable
-data class ProfileRoute(val id: String) : Destination(6)
+data class ProfileRoute(val id: String)
 @Serializable
-data class ThreadRoute(val id: String) : Destination(7)
+data class ThreadRoute(val id: String)
 @Serializable
 data class StatusInteractionDetailRoute(
 	val id: String,
 	val type: InteractionViewType
-) : Destination(9)
+)
 @Serializable
 data class ComposeRoute(
 	val inReplyToId: String? = null,
 	val cw: String = "",
 	val content: String = ""
-) : Destination(10)
+)
 
 @Serializable
-object SettingsRoute : Destination(100)
+object SettingsRoute
 
 @Serializable
-object DebugRoute : Destination(1000)
+object DebugRoute
 @Serializable
-data class DebugStorageRoute(val storage: Int) : Destination(1001)
+data class DebugStorageRoute(val storage: Int)
 
 
 @Composable
