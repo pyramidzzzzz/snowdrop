@@ -12,11 +12,16 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +38,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -48,6 +55,8 @@ import site.remlit.snowdrop.component.ViewSurface
 import site.remlit.snowdrop.component.Visibility
 import site.remlit.snowdrop.model.request.CreateStatusRequest
 import site.remlit.snowdrop.util.LocalNavController
+import site.remlit.snowdrop.util.WarningColor25
+import site.remlit.snowdrop.util.bgIO
 import site.remlit.snowdrop.util.blockingSettings
 import site.remlit.snowdrop.util.getCurrentAccountObjectFlow
 import site.remlit.snowdrop.util.settings
@@ -58,6 +67,7 @@ import snowdrop.shared.generated.resources.icon_home_20px
 import snowdrop.shared.generated.resources.icon_lock_20px
 import snowdrop.shared.generated.resources.icon_mail_20px
 import snowdrop.shared.generated.resources.icon_send_24px
+import snowdrop.shared.generated.resources.icon_warning_24px
 
 @Composable
 @OptIn(ExperimentalSettingsApi::class)
@@ -71,12 +81,19 @@ fun ComposeView(
 	val currentAccount by getCurrentAccountObjectFlow()
 		.collectAsStateWithLifecycle(null)
 
+	var canSubmit by remember { mutableStateOf(false) }
+
 	var visibilityDropdownOpen by remember { mutableStateOf(false) }
+	var showCwField by remember { mutableStateOf(false) }
+
+	if (!initialCw.isBlank()) showCwField = true
 
 	var cw by remember { mutableStateOf(initialCw) }
 	var content by remember { mutableStateOf(initialContent) }
 	var visibility by remember { mutableStateOf(blockingSettings.getString("default_visibility", "public")) }
 
+	// can submit stuff
+	canSubmit = !content.isBlank()
 
 	suspend fun sendPost() {
 		val res = createStatus(CreateStatusRequest(
@@ -86,7 +103,6 @@ fun ComposeView(
 		))
 		if (res.error) return
 		if (res.response == null) return
-		navHandler.popBackStack()
 	}
 
 	TopAppBar(
@@ -233,14 +249,31 @@ fun ComposeView(
 			}
 
 			Column(
-				verticalArrangement = Arrangement.spacedBy(10.dp)
+				modifier = Modifier.fillMaxHeight().weight(1f),
+				verticalArrangement = Arrangement.spacedBy(5.dp)
 			) {
+				if (showCwField)
+					TextField(
+						value = cw,
+						onValueChange = { cw = it },
+						placeholder = { Text("Content warning") },
+						modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, top = 5.dp)
+							.clip(RoundedCornerShape(10.dp)),
+						maxLines = 1,
+						colors = TextFieldDefaults.colors(
+							unfocusedContainerColor = WarningColor25,
+							unfocusedIndicatorColor = Color(0x00000000),
+							focusedContainerColor = WarningColor25,
+							focusedIndicatorColor = Color(0x00000000)
+						)
+					)
+
 				TextField(
-					content,
+					value = content,
 					placeholder = { Text("Write your post here...") },
 					onValueChange = { content = it },
 					modifier = Modifier.imePadding()
-						.fillMaxWidth(),
+						.fillMaxWidth().fillMaxHeight(),
 					colors = TextFieldDefaults.colors(
 						unfocusedContainerColor = Color(0x00000000),
 						unfocusedIndicatorColor = Color(0x00000000),
@@ -253,16 +286,25 @@ fun ComposeView(
 			Row(
 				modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainerHigh)
 					.padding(all = 5.dp)
-					.fillMaxWidth(),
+					.fillMaxWidth()
+					.imePadding(),
 				verticalAlignment = Alignment.CenterVertically
 			) {
+				TextButton(onClick = { showCwField = !showCwField }) {
+					Icon(painterResource(Res.drawable.icon_warning_24px), null)
+				}
+
+
+				// End
 				Row(
-					modifier = Modifier.fillMaxWidth()
-						.navigationBarsPadding(),
+					modifier = Modifier.fillMaxWidth(),
 					horizontalArrangement = Arrangement.End
 				) {
 					Row {
-						TextButton(onClick = { runBlocking { sendPost() } }) {
+						FilledTonalIconButton(
+							onClick = { bgIO { sendPost() }; navHandler.popBackStack() },
+							enabled = canSubmit
+						) {
 							Icon(painterResource(Res.drawable.icon_send_24px), null)
 						}
 					}
