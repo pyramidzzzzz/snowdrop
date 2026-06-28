@@ -27,7 +27,7 @@ data class InstanceV1(
 	val configuration: Configuration? = null,
 
 	val rules: List<Rule>,
-	val thumbnail: String
+	val thumbnail: String? = null
 ) {
 	@Serializable
 	data class Stats(
