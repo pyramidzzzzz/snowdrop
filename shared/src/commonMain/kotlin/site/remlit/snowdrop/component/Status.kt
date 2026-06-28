@@ -61,6 +61,7 @@ import site.remlit.snowdrop.util.SnackbarController
 import site.remlit.snowdrop.util.WarningColor25
 import site.remlit.snowdrop.util.atRoute
 import site.remlit.snowdrop.util.bgIO
+import site.remlit.snowdrop.util.blockingSettings
 import site.remlit.snowdrop.util.getCurrentAccountObjectFlow
 import site.remlit.snowdrop.util.settings
 import site.remlit.snowdrop.util.extension.toFormatShort
@@ -344,7 +345,8 @@ fun Status(status: Status) {
 								) {
 									val emoji = it.toEmoji()
 									if (emoji != null) Emoji(emoji) else Text(it.name)
-									Text("${it.count}")
+									if (!blockingSettings.getBoolean("hide_interaction_counters", false))
+										Text("${it.count}")
 								}
 							}
 						}
