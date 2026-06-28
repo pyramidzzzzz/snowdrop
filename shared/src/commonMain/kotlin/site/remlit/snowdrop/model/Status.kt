@@ -160,7 +160,7 @@ data class Status(
 		@SerialName("remote_url")
 		val remoteUrl: String?,
 		@SerialName("preview_url")
-		val previewUrl: String,
+		val previewUrl: String?,
 		@SerialName("text_url")
 		val textUrl: String?,
 
