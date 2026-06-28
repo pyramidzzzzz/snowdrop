@@ -106,7 +106,7 @@ fun ThreadView(id: String) = ViewSurface {
 			items(
 				items = ancestors,
 				key = { status ->
-					status.id!!
+					status.id
 				}
 			) { status ->
 				StatusComponent(status)
@@ -119,7 +119,7 @@ fun ThreadView(id: String) = ViewSurface {
 			items(
 				items = descendants,
 				key = { status ->
-					status.id!!
+					status.id
 				}
 			) { status ->
 				StatusComponent(status)
