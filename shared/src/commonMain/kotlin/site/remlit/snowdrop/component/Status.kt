@@ -44,6 +44,7 @@ import androidx.navigation.toRoute
 import com.russhwolf.settings.ExperimentalSettingsApi
 import org.jetbrains.compose.resources.painterResource
 import site.remlit.snowdrop.ProfileRoute
+import site.remlit.snowdrop.StatusInteractionDetailRoute
 import site.remlit.snowdrop.ThreadRoute
 import site.remlit.snowdrop.api.statuses.favouriteStatus
 import site.remlit.snowdrop.api.statuses.reblogStatus
@@ -65,6 +66,8 @@ import site.remlit.snowdrop.util.settings
 import site.remlit.snowdrop.util.extension.toFormatShort
 import site.remlit.snowdrop.util.extension.toRelativeString
 import site.remlit.snowdrop.util.getFeature
+import site.remlit.snowdrop.view.InteractionViewType
+import site.remlit.snowdrop.view.StatusInteractionDetailView
 import snowdrop.shared.generated.resources.Res
 import snowdrop.shared.generated.resources.icon_add_24px
 import snowdrop.shared.generated.resources.icon_bookmark_24px
@@ -508,7 +511,9 @@ fun Status(status: Status) {
 							leadingIcon = {
 								Icon(painterResource(Res.drawable.icon_repeat_24px), null)
 							},
-							onClick = { }
+							onClick = {
+								navHandler.navigate(StatusInteractionDetailRoute(realStatus.id, InteractionViewType.Boost))
+							}
 						)
 
 						DropdownMenuItem(
@@ -516,7 +521,9 @@ fun Status(status: Status) {
 							leadingIcon = {
 								Icon(painterResource(Res.drawable.icon_star_24px), null)
 							},
-							onClick = { }
+							onClick = {
+								navHandler.navigate(StatusInteractionDetailRoute(realStatus.id, InteractionViewType.Like))
+							}
 						)
 
 						if (getFeature("reactions"))
@@ -525,7 +532,9 @@ fun Status(status: Status) {
 								leadingIcon = {
 									Icon(painterResource(Res.drawable.icon_star_24px), null)
 								},
-								onClick = { }
+								onClick = {
+									navHandler.navigate(StatusInteractionDetailRoute(realStatus.id, InteractionViewType.Reaction))
+								}
 							)
 
 						HorizontalDivider()

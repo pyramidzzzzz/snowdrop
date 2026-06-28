@@ -101,11 +101,16 @@ data class ProfileRoute(val id: String) : Destination(6)
 @Serializable
 data class ThreadRoute(val id: String) : Destination(7)
 @Serializable
+data class StatusInteractionDetailRoute(
+	val id: String,
+	val type: InteractionViewType
+) : Destination(9)
+@Serializable
 data class ComposeRoute(
 	val inReplyToId: String? = null,
 	val cw: String = "",
 	val content: String = ""
-) : Destination(8)
+) : Destination(9)
 
 @Serializable
 object SettingsRoute : Destination(100)
@@ -321,6 +326,10 @@ fun App() = safe {
 								composable<ThreadRoute> {
 									val args = it.toRoute<ThreadRoute>()
 									ThreadView(args.id)
+								}
+								composable<StatusInteractionDetailRoute> {
+									val args = it.toRoute<StatusInteractionDetailRoute>()
+									StatusInteractionDetailView(args.id, args.type)
 								}
 								composable<ProfileRoute> {
 									val args = it.toRoute<ProfileRoute>()

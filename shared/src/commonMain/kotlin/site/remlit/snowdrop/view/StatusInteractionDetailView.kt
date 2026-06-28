@@ -3,12 +3,14 @@ package site.remlit.snowdrop.view
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryScrollableTabRow
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -17,14 +19,21 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import io.ktor.websocket.Frame
 import org.jetbrains.compose.resources.painterResource
 import site.remlit.snowdrop.api.statuses.getStatusFavouritedBy
+import site.remlit.snowdrop.api.statuses.getStatusReactions
 import site.remlit.snowdrop.api.statuses.getStatusRebloggedBy
 import site.remlit.snowdrop.component.Avatar
+import site.remlit.snowdrop.component.Emoji
 import site.remlit.snowdrop.component.ViewSurface
 import site.remlit.snowdrop.model.Account
 import site.remlit.snowdrop.model.ApiResponse
+import site.remlit.snowdrop.model.Emoji
+import site.remlit.snowdrop.model.Reaction
 import site.remlit.snowdrop.util.LocalNavController
 import site.remlit.snowdrop.util.SnackbarController
 import site.remlit.snowdrop.util.bgIO
@@ -42,6 +51,25 @@ fun StatusInteractionDetailView(
 ) = ViewSurface {
 	val navHandler = LocalNavController.current
 	val snackbarHandler = SnackbarController.current
+
+	@Composable
+	fun AccountRow(account: Account) {
+		Row(
+			modifier = Modifier.padding(10.dp),
+			horizontalArrangement = Arrangement.spacedBy(10.dp)
+		) {
+			Avatar(account)
+
+			Column {
+				Text(account.displayName ?: account.username, fontWeight = FontWeight.Medium)
+				Text("@${account.acct}")
+			}
+		}
+		HorizontalDivider(
+			thickness = 1.dp,
+			color = MaterialTheme.colorScheme.surfaceContainer
+		)
+	}
 
 	TopAppBar(
 		navigationIcon = {
@@ -76,34 +104,42 @@ fun StatusInteractionDetailView(
 			// todo: scrolling
 			LazyColumn {
 				accounts.forEach { account ->
-					item {
-						Row(
-							horizontalArrangement = Arrangement.spacedBy(10.dp)
-						) {
-							Avatar(account)
-
-							Column {
-								Text(account.displayName ?: account.username)
-								Text("@${account.acct}")
-							}
-						}
-						HorizontalDivider(
-							thickness = 1.dp,
-							color = MaterialTheme.colorScheme.surfaceContainer
-						)
-					}
+					item { AccountRow(account) }
 				}
 			}
 		}
 		// todo: implement this!
 		InteractionViewType.Reaction -> {
 			var currentTab by remember { mutableStateOf(0) }
+			val reactions = remember { mutableStateListOf<Reaction>() }
+			bgIO {
+				val res = getStatusReactions(id)
+				if (res.error || res.response == null) {
+					res.handleError(snackbarController = snackbarHandler)
+					return@bgIO
+				}
+				reactions.addAll(res.response)
+			}
 
+			// todo: scrolling
 			PrimaryScrollableTabRow(currentTab) {
-
+				reactions.forEach {
+					val i = reactions.indexOf(it)
+					Tab(
+						selected = currentTab == i,
+						onClick = { currentTab = i },
+						text = {
+							if (it.url != null) {
+								Emoji(Emoji(it.name, it.staticUrl ?: it.url, it.url))
+							} else Text(it.name)
+						}
+					)
+				}
 			}
 			LazyColumn {
-
+				reactions.filter { reactions.indexOf(it) == currentTab }.forEach { reaction ->
+					item { AccountRow(reaction.account) }
+				}
 			}
 		}
 	}
