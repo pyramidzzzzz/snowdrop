@@ -39,7 +39,7 @@ fun MiniStatus(
 			.clip(RoundedCornerShape(10.dp))
 			.border(1.dp, MaterialTheme.colorScheme.surfaceContainerHigh, RoundedCornerShape(10.dp))
 			.clickable(onClick = {
-				navHandler.navigate(ThreadRoute(status.id))
+				navHandler.navigate(ThreadRoute(status.id!!))
 			})
 	) {
 		Column(modifier = Modifier.padding(10.dp)) {
@@ -83,7 +83,7 @@ fun MiniStatus(
 					horizontalArrangement = Arrangement.spacedBy(5.dp),
 					verticalAlignment = Alignment.CenterVertically
 				) {
-					Icon(painterResource(Res.drawable.icon_warning_20px), null,)
+					Icon(painterResource(Res.drawable.icon_warning_20px), null)
 					Text(
 						status.spoilerText,
 						fontWeight = FontWeight.Medium

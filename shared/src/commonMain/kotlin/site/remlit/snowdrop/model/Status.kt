@@ -7,7 +7,7 @@ import kotlin.time.Instant
 
 @Serializable
 data class Status(
-	val id: String,
+	val id: String? = null,
 	val account: Account? = null,
 
 	@SerialName("spoiler_text")
