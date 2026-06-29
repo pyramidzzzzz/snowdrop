@@ -62,7 +62,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import co.touchlab.kermit.Logger
+import coil3.ImageLoader
 import coil3.compose.AsyncImage
+import coil3.compose.setSingletonImageLoaderFactory
+import coil3.decode.Decoder
+import coil3.disk.DiskCache
+import coil3.request.crossfade
 import com.russhwolf.settings.ExperimentalSettingsApi
 import io.ktor.http.Url
 import kotlinx.coroutines.delay
@@ -83,6 +88,7 @@ import site.remlit.snowdrop.util.scrollingUpward
 import site.remlit.snowdrop.util.settings
 import site.remlit.snowdrop.util.setupAppSettings
 import site.remlit.snowdrop.util.cache.setupCache
+import site.remlit.snowdrop.util.config.getGifDecoder
 import site.remlit.snowdrop.util.getAccountObjectFlow
 import site.remlit.snowdrop.util.getAccounts
 import site.remlit.snowdrop.util.getCurrentAccountId
@@ -105,6 +111,7 @@ import snowdrop.shared.generated.resources.icon_home_24px
 import snowdrop.shared.generated.resources.icon_home_filled_24px
 import snowdrop.shared.generated.resources.icon_notifications_24px
 import snowdrop.shared.generated.resources.icon_notifications_filled_24px
+import kotlin.reflect.KClass
 import kotlin.time.Duration.Companion.milliseconds
 
 
@@ -158,6 +165,15 @@ data class DebugStorageRoute(val storage: Int)
 fun App() = safe {
 	setupAppSettings()
 	setupCache()
+
+	setSingletonImageLoaderFactory { context ->
+		ImageLoader.Builder(context)
+			.components {
+				add(getGifDecoder())
+			}
+			.crossfade(100)
+			.build()
+	}
 
 	/*
 	* Variables & Handlers for Whole App Stuff
