@@ -7,7 +7,7 @@ import kotlin.time.Instant
 
 @Serializable
 data class Status(
-	val id: String,
+	override val id: String,
 	val account: Account? = null,
 
 	@SerialName("spoiler_text")
@@ -73,7 +73,7 @@ data class Status(
 	val createdAt: String? = null,
 	@SerialName("edited_at")
 	val editedAt: String? = null,
-) {
+) : IdentifiableObject<String> {
 	@Serializable
 	data class QuoteApproval(
 		val automatic: List<String> = listOf(),

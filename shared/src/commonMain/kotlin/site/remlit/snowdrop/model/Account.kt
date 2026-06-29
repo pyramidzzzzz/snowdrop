@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Account(
-	val id: String,
+	override val id: String,
 	val username: String,
 	val acct: String,
 	val fqn: String? = null,
@@ -58,7 +58,7 @@ data class Account(
 	val createdAt: String,
 	@SerialName("last_status_at")
 	val lastStatusAt: String? = null,
-) {
+) : IdentifiableObject<String> {
 	@Serializable
 	data class Field(
 		val name: String,

@@ -7,7 +7,7 @@ import kotlin.time.Instant
 
 @Serializable
 data class Notification(
-	val id: String,
+	override val id: String,
 	val type: String,
 
 	val account: Account,
@@ -21,7 +21,7 @@ data class Notification(
 
 	@SerialName("created_at")
 	val createdAt: String
-) {
+) : IdentifiableObject<String> {
 	@Serializable
 	data class ChuckyaReaction(
 		val name: String? = null,

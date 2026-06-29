@@ -50,6 +50,7 @@ import org.jetbrains.compose.resources.stringResource
 import site.remlit.snowdrop.SettingsRoute
 import site.remlit.snowdrop.api.timeline.getHomeTimeline
 import site.remlit.snowdrop.api.timeline.getPublicTimeline
+import site.remlit.snowdrop.component.RefreshableTimeline
 import site.remlit.snowdrop.component.Status
 import site.remlit.snowdrop.component.ViewSurface
 import site.remlit.snowdrop.model.ApiResponse
@@ -99,7 +100,6 @@ fun TimelineView() = ViewSurface {
 		verticalArrangement = Arrangement.Center
 	) {
 		val navHandler = LocalNavController.current
-		val coroutineScope = rememberCoroutineScope()
 
 		// 0 - home, 1 - local, 2 - bubble, 3 - global
 		val timelineType by settings.getIntFlow("timeline", 0)
@@ -118,34 +118,6 @@ fun TimelineView() = ViewSurface {
 				else -> getPublicTimeline(maxId = maxId, minId = minId, sinceId = sinceId, remote = true) // else also 3
 			}
 		}
-
-		val timeline = remember { mutableStateListOf<Status>() }
-		val refreshState = rememberPullToRefreshState()
-		val listState = rememberLazyListState().also {
-			it.ScrollEndCallback {
-				coroutineScope.launch {
-					val res = getTimeline(maxId = timeline.last().id)
-					if (res.error) return@launch
-					if (res.response == null) return@launch
-					timeline.addAll(res.response)
-				}
-			}
-		}
-		var isRefreshing by remember { mutableStateOf(false) }
-
-		suspend fun addOrUpdateTimeline() {
-			isRefreshing = true
-			val res = getTimeline()
-			if (res.error) return
-			if (res.response == null) return
-			timeline.clear()
-			timeline.addAll(res.response)
-			listState.scrollToItem(0)
-			isRefreshing = false
-		}
-
-		// whenever the timelineType changes, this function runs.
-		LaunchedEffect(timelineType) { addOrUpdateTimeline() }
 
 		@Composable
 		fun RenderTimelineTypeIcon(type: Int? = null) {
@@ -234,37 +206,11 @@ fun TimelineView() = ViewSurface {
 			}
 		)
 
-		PullToRefreshBox(
-			isRefreshing = isRefreshing,
-			state = refreshState,
-			onRefresh = {
-				coroutineScope.launch {
-					coroutineScope.launch { addOrUpdateTimeline() }
-					listState.scrollToItem(0)
-				}
-			}
-		) {
-			// for determining if the compose FAB should be visible
-			val nestedScrollConnection = remember {
-				object : NestedScrollConnection {
-					override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-						if (available.y < 0) scrollingUpward = false
-						else if (available.y > 0) scrollingUpward = true
-
-						return Offset.Zero
-					}
-				}
-			}
-
-			LazyColumn(
-				state = listState,
-				modifier = Modifier.fillMaxSize().nestedScroll(nestedScrollConnection),
-			) {
-				items(
-					items = timeline,
-					key = { it.id }
-				) { Status(it) }
-			}
-		}
+		RefreshableTimeline(
+			fetchMethod = { maxId, minId, sinceId -> getTimeline(maxId, minId, sinceId) },
+			timelineComponent = { Status(it) },
+			refreshKey = timelineType,
+			countTowardsScrollingUpward = true
+		)
 	}
 }
