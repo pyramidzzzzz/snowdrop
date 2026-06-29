@@ -68,8 +68,9 @@ kotlin {
 			implementation(libs.kotlinx.serialization.cbor)
 
 			implementation(libs.kermit)
-			implementation(libs.kamel.image.default)
 			implementation(libs.htmlconverter)
+			implementation(libs.coil.compose)
+			implementation(libs.coil.network.ktor3)
 		}
 		commonTest.dependencies {
 			implementation(libs.kotlin.test)

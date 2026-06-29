@@ -7,12 +7,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import io.kamel.image.KamelImage
-import io.kamel.image.asyncPainterResource
+import coil3.compose.AsyncImage
 import site.remlit.snowdrop.model.Account
 
 const val bigAvatarSize = 84
@@ -41,6 +44,8 @@ fun Avatar(
 		else if (smaller) smallerAvatarRadius.dp
 		else avatarRadius.dp
 
+	var isLoading by remember { mutableStateOf(true) }
+
 	@Composable
 	fun fallback() {
 		Box(
@@ -52,14 +57,17 @@ fun Avatar(
 	}
 
 	if (account.avatar != null) {
-		KamelImage(
-			{ asyncPainterResource(account.avatarStatic ?: account.avatar) },
-			account.avatarDescription,
-			onLoading = { fallback() },
-			modifier = Modifier.clip(RoundedCornerShape(radius))
-				.height(size)
-				.width(size),
-			contentScale = ContentScale.Crop
-		)
+		Box {
+			AsyncImage(
+				model = account.avatarStatic ?: account.avatar,
+				contentDescription = account.avatarDescription,
+				contentScale = ContentScale.Crop,
+				onSuccess = { isLoading = false },
+				modifier = Modifier.clip(RoundedCornerShape(radius))
+					.height(size)
+					.width(size),
+			)
+			if (isLoading) fallback()
+		}
 	} else fallback()
 }

@@ -40,19 +40,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.russhwolf.settings.ExperimentalSettingsApi
-import io.kamel.image.KamelImage
-import io.kamel.image.asyncPainterResource
-import kotlinx.coroutines.Dispatchers
 import org.jetbrains.compose.resources.painterResource
 import site.remlit.snowdrop.ProfileRoute
-import site.remlit.snowdrop.api.accounts.getAccount
 import site.remlit.snowdrop.component.Avatar
 import site.remlit.snowdrop.component.HtmlContent
 import site.remlit.snowdrop.component.ViewSurface
 import site.remlit.snowdrop.component.bigAvatarRadius
 import site.remlit.snowdrop.component.bigAvatarSize
-import site.remlit.snowdrop.model.Account
 import site.remlit.snowdrop.util.LocalNavController
 import site.remlit.snowdrop.util.atRoute
 import site.remlit.snowdrop.util.cache.fetchAccount
@@ -153,16 +149,20 @@ fun ProfileView(id: String) = ViewSurface {
 						)
 					}
 
-					if (account!!.header != null) {
-						KamelImage(
-							{ asyncPainterResource(account!!.header!!) },
-							account!!.headerDescription,
-							onLoading = { fallbackHeader() },
-							modifier = Modifier.height(headerHeight.dp)
-								.fillMaxWidth(),
-							contentScale = ContentScale.Crop
+					var isHeaderLoading by remember { mutableStateOf(true) }
 
-						)
+					if (account!!.header != null) {
+						Box {
+							AsyncImage(
+								model = account!!.headerStatic ?: account!!.header,
+								contentDescription = account!!.headerDescription,
+								contentScale = ContentScale.Crop,
+								onSuccess = { isHeaderLoading = false },
+								modifier = Modifier.height(headerHeight.dp)
+									.fillMaxWidth(),
+							)
+							if (isHeaderLoading) fallbackHeader()
+						}
 					} else fallbackHeader()
 
 					// The Rest
