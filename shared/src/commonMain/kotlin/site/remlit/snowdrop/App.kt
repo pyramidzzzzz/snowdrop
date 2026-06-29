@@ -45,6 +45,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -392,11 +393,12 @@ fun App() = safe {
 										) {
 											Row(
 												modifier = Modifier.padding(10.dp),
-												horizontalArrangement = Arrangement.spacedBy(10.dp)
+												horizontalArrangement = Arrangement.spacedBy(10.dp),
+												verticalAlignment = Alignment.CenterVertically
 											) {
 												Avatar(account!!)
 
-												Column(verticalArrangement = Arrangement.Center) {
+												Column {
 													Text(
 														account!!.displayName ?: account!!.url,
 														fontWeight = FontWeight.Medium

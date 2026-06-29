@@ -3,12 +3,17 @@ package site.remlit.snowdrop.view
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -17,10 +22,12 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,25 +35,46 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.russhwolf.settings.ExperimentalSettingsApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import site.remlit.snowdrop.SettingsRoute
 import site.remlit.snowdrop.api.timeline.getHomeTimeline
+import site.remlit.snowdrop.api.timeline.getPublicTimeline
 import site.remlit.snowdrop.component.Status
 import site.remlit.snowdrop.component.ViewSurface
+import site.remlit.snowdrop.model.ApiResponse
 import site.remlit.snowdrop.model.Status
 import site.remlit.snowdrop.util.LocalNavController
+import site.remlit.snowdrop.util.bg
+import site.remlit.snowdrop.util.blockingSettings
+import site.remlit.snowdrop.util.getFeature
 import site.remlit.snowdrop.util.scrollingUpward
+import site.remlit.snowdrop.util.settings
 import snowdrop.shared.generated.resources.Res
 import snowdrop.shared.generated.resources.add_account
+import snowdrop.shared.generated.resources.bubble
+import snowdrop.shared.generated.resources.global
+import snowdrop.shared.generated.resources.home
+import snowdrop.shared.generated.resources.icon_bubble_chart_24px
+import snowdrop.shared.generated.resources.icon_globe_24px
+import snowdrop.shared.generated.resources.icon_home_24px
+import snowdrop.shared.generated.resources.icon_keyboard_arrow_down_24px
+import snowdrop.shared.generated.resources.icon_keyboard_arrow_up_24px
+import snowdrop.shared.generated.resources.icon_map_24px
 import snowdrop.shared.generated.resources.icon_settings_24px
+import snowdrop.shared.generated.resources.local
 import snowdrop.shared.generated.resources.timeline
+import kotlin.math.sin
 
 @Composable
 inline fun LazyListState.ScrollEndCallback(crossinline callback: () -> Unit) {
@@ -63,6 +91,7 @@ inline fun LazyListState.ScrollEndCallback(crossinline callback: () -> Unit) {
 	}
 }
 
+@OptIn(ExperimentalSettingsApi::class)
 @Composable
 fun TimelineView() = ViewSurface {
 	Column(
@@ -72,47 +101,131 @@ fun TimelineView() = ViewSurface {
 		val navHandler = LocalNavController.current
 		val coroutineScope = rememberCoroutineScope()
 
+		// 0 - home, 1 - local, 2 - bubble, 3 - global
+		val timelineType by settings.getIntFlow("timeline", 0)
+			.collectAsStateWithLifecycle(0)
+		var timelinePickerOpen by remember { mutableStateOf(false) }
+
+		suspend fun getTimeline(
+			maxId: String? = null,
+			minId: String? = null,
+			sinceId: String? = null
+		): ApiResponse<List<Status>> {
+			return when (timelineType) {
+				0 -> getHomeTimeline(maxId = maxId, minId = minId, sinceId = sinceId)
+				1 -> getPublicTimeline(maxId = maxId, minId = minId, sinceId = sinceId, local = true)
+				2 -> getPublicTimeline(maxId = maxId, minId = minId, sinceId = sinceId, remote = true) // todo: fix bubble timeline
+				else -> getPublicTimeline(maxId = maxId, minId = minId, sinceId = sinceId, remote = true) // else also 3
+			}
+		}
+
 		val timeline = remember { mutableStateListOf<Status>() }
 		val refreshState = rememberPullToRefreshState()
 		val listState = rememberLazyListState().also {
 			it.ScrollEndCallback {
 				coroutineScope.launch {
-					val res = getHomeTimeline(maxId = timeline.last().id)
+					val res = getTimeline(maxId = timeline.last().id)
 					if (res.error) return@launch
 					if (res.response == null) return@launch
 					timeline.addAll(res.response)
 				}
 			}
 		}
-		val isRefreshing = remember { mutableStateOf(false) }
+		var isRefreshing by remember { mutableStateOf(false) }
 
 		suspend fun addOrUpdateTimeline() {
-			isRefreshing.value = true
-			val res = getHomeTimeline()
+			isRefreshing = true
+			val res = getTimeline()
 			if (res.error) return
 			if (res.response == null) return
 			timeline.clear()
 			timeline.addAll(res.response)
 			listState.scrollToItem(0)
-			isRefreshing.value = false
+			isRefreshing = false
 		}
 
-		LaunchedEffect(Unit) {
-			addOrUpdateTimeline()
+		// whenever the timelineType changes, this function runs.
+		LaunchedEffect(timelineType) { addOrUpdateTimeline() }
+
+		@Composable
+		fun RenderTimelineTypeIcon(type: Int? = null) {
+			when (type ?: timelineType) {
+				0 -> Icon(painterResource(Res.drawable.icon_home_24px), null)
+				1 -> Icon(painterResource(Res.drawable.icon_map_24px), null)
+				2 -> Icon(painterResource(Res.drawable.icon_bubble_chart_24px), null)
+				3 -> Icon(painterResource(Res.drawable.icon_globe_24px), null)
+			}
 		}
 
+		@Composable
+		fun RenderTimelineSelectionDropdown() {
+			DropdownMenu(
+				expanded = timelinePickerOpen,
+				onDismissRequest = { timelinePickerOpen = false },
+			) {
+				DropdownMenuItem(
+					leadingIcon = { RenderTimelineTypeIcon(0) },
+					text = { Text(stringResource(Res.string.home)) },
+					onClick = { blockingSettings.putInt("timeline", 0); timelinePickerOpen = false }
+				)
+				DropdownMenuItem(
+					leadingIcon = { RenderTimelineTypeIcon(1) },
+					text = { Text(stringResource(Res.string.local)) },
+					onClick = { blockingSettings.putInt("timeline", 1); timelinePickerOpen = false }
+				)
+				if (getFeature("bubble_timeline"))
+					DropdownMenuItem(
+						leadingIcon = { RenderTimelineTypeIcon(2) },
+						text = { Text(stringResource(Res.string.bubble)) },
+						onClick = { blockingSettings.putInt("timeline", 2); timelinePickerOpen = false }
+					)
+				DropdownMenuItem(
+					leadingIcon = { RenderTimelineTypeIcon(3) },
+					text = { Text(stringResource(Res.string.global)) },
+					onClick = { blockingSettings.putInt("timeline", 3); timelinePickerOpen = false }
+				)
+			}
+		}
+
+
+		/*
+		 *
+		 * Actual Timeline View
+		 *
+		 */
 		TopAppBar(
 			modifier = Modifier.clickable(
 				interactionSource = MutableInteractionSource(),
 				indication = null,
 				onClick = {
+					/*
 					coroutineScope.launch {
 						listState.animateScrollToItem(0)
 					}
+					*/
+
+					timelinePickerOpen = !timelinePickerOpen
 				}
 			),
 			title = {
-				Text(stringResource(Res.string.timeline))
+				Row(
+					horizontalArrangement = Arrangement.spacedBy(10.dp),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					RenderTimelineTypeIcon()
+
+					when (timelineType) {
+						0 -> Text(stringResource(Res.string.home))
+						1 -> Text(stringResource(Res.string.local))
+						2 -> Text(stringResource(Res.string.bubble))
+						3 -> Text(stringResource(Res.string.global))
+					}
+
+					if (timelinePickerOpen) Icon(painterResource(Res.drawable.icon_keyboard_arrow_up_24px), null)
+					else Icon(painterResource(Res.drawable.icon_keyboard_arrow_down_24px), null)
+
+					RenderTimelineSelectionDropdown()
+				}
 			},
 			actions = {
 				IconButton(onClick = { navHandler.navigate(SettingsRoute) }) {
@@ -122,7 +235,7 @@ fun TimelineView() = ViewSurface {
 		)
 
 		PullToRefreshBox(
-			isRefreshing = isRefreshing.value,
+			isRefreshing = isRefreshing,
 			state = refreshState,
 			onRefresh = {
 				coroutineScope.launch {
@@ -131,6 +244,7 @@ fun TimelineView() = ViewSurface {
 				}
 			}
 		) {
+			// for determining if the compose FAB should be visible
 			val nestedScrollConnection = remember {
 				object : NestedScrollConnection {
 					override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
@@ -144,18 +258,12 @@ fun TimelineView() = ViewSurface {
 
 			LazyColumn(
 				state = listState,
-				modifier = Modifier
-					.fillMaxSize()
-					.nestedScroll(nestedScrollConnection),
+				modifier = Modifier.fillMaxSize().nestedScroll(nestedScrollConnection),
 			) {
 				items(
 					items = timeline,
-					key = { status ->
-						status.id!!
-					}
-				) { status ->
-					Status(status)
-				}
+					key = { it.id }
+				) { Status(it) }
 			}
 		}
 	}
