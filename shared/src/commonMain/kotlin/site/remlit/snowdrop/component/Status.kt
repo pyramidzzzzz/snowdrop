@@ -231,6 +231,7 @@ fun Status(status: Status) {
 					.fillMaxWidth(),
 				verticalAlignment = Alignment.CenterVertically
 			) {
+				// todo: this needs to be clipped since it's casting the clickable effect outside of the avatar boundaries
 				Column(
 					modifier = Modifier.padding(end = 10.dp)
 						.clickable(onClick = {
@@ -239,7 +240,7 @@ fun Status(status: Status) {
 				) {
 					Avatar(
 						realStatus.account!!,
-						small = inThreadView && !threadViewMainStatus
+						small = inThreadView && !threadViewMainStatus,
 					)
 				}
 

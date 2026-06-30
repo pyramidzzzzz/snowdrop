@@ -1,5 +1,10 @@
 # Contributing
 
+## AI contributions
+
+In no way are AI generated pull requests, issues, or code welcome in this code base. You will have your issue or pull
+request closed, and we will ignore you if you break this rule.
+
 ## What API should I use as a reference?
 Always up-to-date Iceshrimp.NET with all non-essential values nullable. Most Iceshrimp.NET instances will have an API
 reference at `/swagger`. If you don't know any, you can use https://next.iceshrimp.dev/.

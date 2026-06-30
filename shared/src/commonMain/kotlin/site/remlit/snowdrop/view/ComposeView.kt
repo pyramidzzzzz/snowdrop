@@ -314,8 +314,7 @@ fun ComposeView(
 					value = content,
 					placeholder = { Text(stringResource(Res.string.write_your_post_here)) },
 					onValueChange = { content = it },
-					modifier = Modifier.imePadding()
-						.fillMaxWidth().fillMaxHeight(),
+					modifier = Modifier.fillMaxWidth().fillMaxHeight(),
 					colors = TextFieldDefaults.colors(
 						unfocusedContainerColor = Color(0x00000000),
 						unfocusedIndicatorColor = Color(0x00000000),
