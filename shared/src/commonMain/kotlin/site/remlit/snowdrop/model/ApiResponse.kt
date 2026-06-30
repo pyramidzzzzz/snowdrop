@@ -2,6 +2,7 @@ package site.remlit.snowdrop.model
 
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import io.ktor.http.HttpMethod
 import kotlinx.serialization.Serializable
 import site.remlit.snowdrop.util.SnackbarController
 import site.remlit.snowdrop.util.bg
@@ -19,6 +20,7 @@ data class ApiResponse<T>(
 ) {
 	fun handleError(snackbarController: SnackbarHostState) = bg {
 		// todo: pass route to this somehow
-		snackbarController.showSnackbar("Error: $message")
+		if (error) snackbarController.showSnackbar("Error: $message")
+		else if (response == null) snackbarController.showSnackbar("Error: Response was null")
 	}
 }

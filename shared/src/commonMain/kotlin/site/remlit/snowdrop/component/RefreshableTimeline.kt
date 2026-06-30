@@ -30,6 +30,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import site.remlit.snowdrop.model.ApiResponse
 import site.remlit.snowdrop.model.IdentifiableObject
+import site.remlit.snowdrop.util.SnackbarController
 import site.remlit.snowdrop.util.scrollingUpward
 import site.remlit.snowdrop.view.ScrollEndCallback
 import snowdrop.shared.generated.resources.Res
@@ -53,6 +54,8 @@ fun <T : IdentifiableObject<String>> RefreshableTimeline(
 	refreshKey: Int = 0,
 	countTowardsScrollingUpward: Boolean = false
 ) {
+	val snackbarHandler = SnackbarController.current
+
 	val coroutineScope = rememberCoroutineScope()
 
 	val timeline = remember { mutableStateListOf<T>() }
@@ -62,8 +65,10 @@ fun <T : IdentifiableObject<String>> RefreshableTimeline(
 			coroutineScope.launch {
 				if (timeline.isEmpty()) return@launch
 				val res = fetchMethod(timeline.last().id, null, null)
-				if (res.error) return@launch
-				if (res.response == null) return@launch
+				if (res.error || res.response == null) {
+					res.handleError(snackbarHandler)
+					return@launch
+				}
 				timeline.addAll(res.response)
 			}
 		}

@@ -19,6 +19,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -61,7 +62,8 @@ fun StatusInteractionDetailView(
 	fun AccountRow(account: Account) {
 		Row(
 			modifier = Modifier.padding(10.dp),
-			horizontalArrangement = Arrangement.spacedBy(10.dp)
+			horizontalArrangement = Arrangement.spacedBy(10.dp),
+			verticalAlignment = Alignment.CenterVertically
 		) {
 			Avatar(account)
 
@@ -113,7 +115,6 @@ fun StatusInteractionDetailView(
 				}
 			}
 		}
-		// todo: implement this!
 		InteractionViewType.Reaction -> {
 			var currentTab by remember { mutableStateOf(0) }
 			val reactions = remember { mutableStateListOf<Reaction>() }

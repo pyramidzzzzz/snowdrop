@@ -57,6 +57,7 @@ import site.remlit.snowdrop.component.ViewSurface
 import site.remlit.snowdrop.component.Visibility
 import site.remlit.snowdrop.model.request.CreateStatusRequest
 import site.remlit.snowdrop.util.LocalNavController
+import site.remlit.snowdrop.util.SnackbarController
 import site.remlit.snowdrop.util.WarningColor25
 import site.remlit.snowdrop.util.bgIO
 import site.remlit.snowdrop.util.blockingSettings
@@ -97,6 +98,7 @@ fun ComposeView(
 	visibility: String? = null
 ) = ViewSurface {
 	val navHandler = LocalNavController.current
+	val snackbarHandler = SnackbarController.current
 
 	val currentAccount by getCurrentAccountObjectFlow()
 		.collectAsStateWithLifecycle(null)
@@ -128,8 +130,10 @@ fun ComposeView(
 			spoilerText = cw,
 			visibility = visibility
 		))
-		if (res.error) return
-		if (res.response == null) return
+		if (res.error || res.response == null) {
+			res.handleError(snackbarHandler)
+			return
+		}
 	}
 
 	TopAppBar(

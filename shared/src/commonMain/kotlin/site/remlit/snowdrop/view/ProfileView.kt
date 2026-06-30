@@ -26,7 +26,6 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,13 +44,17 @@ import com.russhwolf.settings.ExperimentalSettingsApi
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import site.remlit.snowdrop.ProfileRoute
+import site.remlit.snowdrop.api.accounts.getRelationships
 import site.remlit.snowdrop.component.Avatar
 import site.remlit.snowdrop.component.HtmlContent
 import site.remlit.snowdrop.component.ViewSurface
 import site.remlit.snowdrop.component.bigAvatarRadius
 import site.remlit.snowdrop.component.bigAvatarSize
+import site.remlit.snowdrop.model.Relationship
 import site.remlit.snowdrop.util.LocalNavController
+import site.remlit.snowdrop.util.SnackbarController
 import site.remlit.snowdrop.util.atRoute
+import site.remlit.snowdrop.util.bgIO
 import site.remlit.snowdrop.util.cache.fetchAccount
 import site.remlit.snowdrop.util.extension.formatNumber
 import site.remlit.snowdrop.util.getCurrentAccountObjectFlow
@@ -64,7 +67,6 @@ import snowdrop.shared.generated.resources.following
 import snowdrop.shared.generated.resources.icon_arrow_back_24
 import snowdrop.shared.generated.resources.joined_at_x
 import snowdrop.shared.generated.resources.media
-import snowdrop.shared.generated.resources.post
 import snowdrop.shared.generated.resources.posts
 import snowdrop.shared.generated.resources.posts_and_replies
 import snowdrop.shared.generated.resources.profile
@@ -76,6 +78,7 @@ const val headerHeight = 200
 @OptIn(ExperimentalSettingsApi::class)
 fun ProfileView(id: String) = ViewSurface {
 	val navHandler = LocalNavController.current
+	val snackbarHandler = SnackbarController.current
 	val currentDest = navHandler.currentDestination
 
 	/* Preferences */
@@ -86,7 +89,8 @@ fun ProfileView(id: String) = ViewSurface {
 	val currentAccount by getCurrentAccountObjectFlow()
 		.collectAsStateWithLifecycle(null)
 
-	val account by fetchAccount(id).collectAsStateWithLifecycle(null)
+	val account by fetchAccount(id, snackbarHandler)
+		.collectAsStateWithLifecycle(null)
 
 	var isMe by remember { mutableStateOf(false) }
 	if (currentAccount != null && currentAccount?.id == account?.id)
@@ -94,14 +98,17 @@ fun ProfileView(id: String) = ViewSurface {
 
 	val scrollState = rememberScrollState()
 
-	/* todo: relationships on profile view
-	* var relationships by remember { mutableStateOf<List<RelationshipResponse>?>(null) }
-	if (!isMe) runBlocking {
-		val req = getRelationships(listOf(currentAccount!!.id, account!!.id))
-		if (req.error) return@runBlocking
-		if (req.response == null) return@runBlocking
-		relationships = req.response
-	}*/
+	/*
+	var relationships by remember { mutableStateOf<List<Relationship>?>(null) }
+	if (!isMe) bgIO {
+		val res = getRelationships(listOf(currentAccount!!.id, account!!.id))
+		if (res.error || res.response == null) {
+			res.handleError(snackbarHandler)
+			return@bgIO
+		}
+		relationships = res.response
+	}
+	* */
 
 	val verticalOffset = (-((bigAvatarSize/2) - 4)).dp
 	var selectedTab by remember { mutableStateOf(0) }

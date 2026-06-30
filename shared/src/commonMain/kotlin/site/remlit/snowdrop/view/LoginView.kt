@@ -43,6 +43,7 @@ import site.remlit.snowdrop.component.ViewSurface
 import site.remlit.snowdrop.model.response.CreateAppResponse
 import site.remlit.snowdrop.model.response.OauthToken
 import site.remlit.snowdrop.util.LocalNavController
+import site.remlit.snowdrop.util.SnackbarController
 import site.remlit.snowdrop.util.bg
 import site.remlit.snowdrop.util.bgIO
 import site.remlit.snowdrop.util.blockingSettings
@@ -68,6 +69,7 @@ fun LoginView(
 ) = ViewSurface {
 	val navController = LocalNavController.current
 	val uriHandler = LocalUriHandler.current
+	val snackbarHandler = SnackbarController.current
 
 
 	// Text field states
@@ -96,7 +98,6 @@ fun LoginView(
 
 		waitingForNext = true
 
-		// todo: this blocking is annoying
 		bg {
 			val existingAccounts = settings.getString("accounts", "")
 			val accountId = "_S-${Uuid.random()}"
@@ -106,8 +107,10 @@ fun LoginView(
 
 			// get link you must visit to get token
 			val res = createApp()
-			if (res.error) return@bg
-			if (res.response !is CreateAppResponse) return@bg
+			if (res.error || res.response == null) {
+				res.handleError(snackbarHandler)
+				return@bg
+			}
 
 			settings.putString("account_${accountId}_token", "")
 			settings.putString("account_${accountId}_client_id", res.response.clientId)
@@ -125,13 +128,15 @@ fun LoginView(
 		}
 	}
 
-	fun finishButtonPressed() {
-		val res = runBlocking { createToken(oauthCallbackCode!!) }
+	fun finishButtonPressed() = bg {
+		val res = createToken(oauthCallbackCode!!)
 		Logger.d { res.toString() }
 		blockingSettings.remove("oauth_callback")
 
-		if (res.error) return
-		if (res.response !is OauthToken) return
+		if (res.error || res.response == null) {
+			res.handleError(snackbarHandler)
+			return@bg
+		}
 
 		blockingSettings.putString("account_${currentAccountId}_token", res.response.accessToken)
 		blockingSettings.putBoolean("logged_in", true)

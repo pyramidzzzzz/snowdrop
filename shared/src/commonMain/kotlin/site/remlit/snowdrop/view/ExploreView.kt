@@ -23,6 +23,7 @@ import org.jetbrains.compose.resources.stringResource
 import site.remlit.snowdrop.api.search
 import site.remlit.snowdrop.component.ViewSurface
 import site.remlit.snowdrop.model.response.SearchResponse
+import site.remlit.snowdrop.util.bgIO
 import snowdrop.shared.generated.resources.Res
 import snowdrop.shared.generated.resources.explore
 import snowdrop.shared.generated.resources.followers
@@ -55,7 +56,7 @@ fun ExploreView() = ViewSurface {
 			onValueChange = { query = it },
 			placeholder = { Text(stringResource(Res.string.search_for_posts_or_users)) },
 			keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
-			keyboardActions = KeyboardActions(onGo = { runBlocking { submitSearch() } }),
+			keyboardActions = KeyboardActions(onGo = { bgIO { submitSearch() } }),
 			modifier = Modifier.fillMaxWidth()
 		)
 	}

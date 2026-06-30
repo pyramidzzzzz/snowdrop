@@ -27,18 +27,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import site.remlit.snowdrop.api.statuses.getStatus
 import site.remlit.snowdrop.api.statuses.getStatusContext
-import site.remlit.snowdrop.api.timeline.getHomeTimeline
-import site.remlit.snowdrop.component.Status
 import site.remlit.snowdrop.component.ViewSurface
 import site.remlit.snowdrop.model.Status
-import site.remlit.snowdrop.model.StatusContext
 import site.remlit.snowdrop.util.LocalNavController
+import site.remlit.snowdrop.util.SnackbarController
 import site.remlit.snowdrop.util.cache.fetchStatus
 import site.remlit.snowdrop.util.getCurrentAccountObjectFlow
 import snowdrop.shared.generated.resources.Res
-import snowdrop.shared.generated.resources.add_account
 import snowdrop.shared.generated.resources.icon_arrow_back_24
 import snowdrop.shared.generated.resources.post
 import snowdrop.shared.generated.resources.post_by
@@ -47,11 +43,13 @@ import site.remlit.snowdrop.component.Status as StatusComponent
 @Composable
 fun ThreadView(id: String) = ViewSurface {
 	val navHandler = LocalNavController.current
+	val snackbarHandler = SnackbarController.current
 
 	val currentAccount by getCurrentAccountObjectFlow()
 		.collectAsStateWithLifecycle(null)
 
-	val status by fetchStatus(id).collectAsStateWithLifecycle(null)
+	val status by fetchStatus(id, snackbarHandler)
+		.collectAsStateWithLifecycle(null)
 
 	val ancestors = remember { mutableStateListOf<Status>() }
 	val descendants = remember { mutableStateListOf<Status>() }
@@ -109,9 +107,7 @@ fun ThreadView(id: String) = ViewSurface {
 		) {
 			items(
 				items = ancestors,
-				key = { status ->
-					status.id!!
-				}
+				key = { it.id }
 			) { status ->
 				StatusComponent(status)
 			}
@@ -122,9 +118,7 @@ fun ThreadView(id: String) = ViewSurface {
 
 			items(
 				items = descendants,
-				key = { status ->
-					status.id!!
-				}
+				key = { it.id }
 			) { status ->
 				StatusComponent(status)
 			}
