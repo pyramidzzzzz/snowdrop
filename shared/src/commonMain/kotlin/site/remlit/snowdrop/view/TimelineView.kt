@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.onEach
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import site.remlit.snowdrop.SettingsRoute
+import site.remlit.snowdrop.api.timeline.getBubbleTimeline
 import site.remlit.snowdrop.api.timeline.getHomeTimeline
 import site.remlit.snowdrop.api.timeline.getPublicTimeline
 import site.remlit.snowdrop.component.RefreshableTimeline
@@ -93,7 +94,8 @@ fun TimelineView() = ViewSurface {
 			return when (timelineType) {
 				0 -> getHomeTimeline(maxId = maxId, minId = minId, sinceId = sinceId)
 				1 -> getPublicTimeline(maxId = maxId, minId = minId, sinceId = sinceId, local = true)
-				2 -> getPublicTimeline(maxId = maxId, minId = minId, sinceId = sinceId, remote = true) // todo: fix bubble timeline
+				2 -> getBubbleTimeline(maxId = maxId, minId = minId, sinceId = sinceId)
+				3 -> getPublicTimeline(maxId = maxId, minId = minId, sinceId = sinceId, remote = true)
 				else -> getPublicTimeline(maxId = maxId, minId = minId, sinceId = sinceId, remote = true) // else also 3
 			}
 		}
@@ -124,7 +126,7 @@ fun TimelineView() = ViewSurface {
 					text = { Text(stringResource(Res.string.local)) },
 					onClick = { blockingSettings.putInt("timeline", 1); timelinePickerOpen = false }
 				)
-				if (getFeature("bubble_timeline"))
+				if (getFeature("bubble_timeline") || getFeature("bubble_timeline_chuckya"))
 					DropdownMenuItem(
 						leadingIcon = { RenderTimelineTypeIcon(2) },
 						text = { Text(stringResource(Res.string.bubble)) },

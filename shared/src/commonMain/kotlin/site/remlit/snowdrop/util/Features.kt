@@ -73,7 +73,14 @@ suspend fun determineFeatures() {
 		software == Software.Akkoma ||
 		software == Software.IceshrimpNET
 	)
-	putFeature("bubble_timeline", false)
+	putFeature("bubble_timeline", true)
+	else putFeature("bubble_timeline", false)
+
+	if (
+		software == Software.Chuckya
+	)
+	putFeature("bubble_timeline_chuckya", true)
+	else putFeature("bubble_timeline_chuckya", false)
 
 	determiningFeatures = false
 }
