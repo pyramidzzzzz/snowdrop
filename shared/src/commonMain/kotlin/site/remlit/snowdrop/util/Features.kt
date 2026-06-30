@@ -69,7 +69,10 @@ suspend fun determineFeatures() {
 	) putFeature("reactions", true)
 	else putFeature("reactions", false)
 
-	// todo: detect bubble timeline support
+	if (
+		software == Software.Akkoma ||
+		software == Software.IceshrimpNET
+	)
 	putFeature("bubble_timeline", false)
 
 	determiningFeatures = false
