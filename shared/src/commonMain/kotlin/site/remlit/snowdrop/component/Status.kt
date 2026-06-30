@@ -102,7 +102,6 @@ import snowdrop.shared.generated.resources.icon_star_24px
 import snowdrop.shared.generated.resources.icon_star_filled_24px
 import snowdrop.shared.generated.resources.icon_volume_off_24px
 import snowdrop.shared.generated.resources.icon_warning_24px
-import snowdrop.shared.generated.resources.liked_your_post
 import snowdrop.shared.generated.resources.mute
 import snowdrop.shared.generated.resources.open_in_browser
 import snowdrop.shared.generated.resources.report
@@ -177,7 +176,7 @@ fun Status(status: Status) {
 	Column(
 		modifier = Modifier.clickable(
 			enabled = !inThreadView || (inThreadView && !threadViewMainStatus),
-			onClick = { navHandler.navigate(ThreadRoute(realStatus.id!!)) }
+			onClick = { navHandler.navigate(ThreadRoute(realStatus.id)) }
 		).background(
 			if (threadViewMainStatus) MaterialTheme.colorScheme.surfaceContainerLow
 			else Color.Unspecified
@@ -430,8 +429,8 @@ fun Status(status: Status) {
 							if (!isMine && realStatus.visibility != "public" && realStatus.visibility != "unlisted")
 								return@bgIO
 
-							val res: ApiResponse<Status> = if (realStatus.reblogged) unreblogStatus(realStatus.id!!)
-							else reblogStatus(realStatus.id!!)
+							val res: ApiResponse<Status> = if (realStatus.reblogged) unreblogStatus(realStatus.id)
+							else reblogStatus(realStatus.id)
 							if (res.error || res.response == null) {
 								res.handleError(snackbarController)
 								return@bgIO
@@ -470,8 +469,8 @@ fun Status(status: Status) {
 					onClick = {
 						haptics.performHapticFeedback(HapticFeedbackType.Confirm)
 						bgIO {
-							val res: ApiResponse<Status> = if (realStatus.favourited) unfavouriteStatus(realStatus.id!!)
-							else favouriteStatus(realStatus.id!!)
+							val res: ApiResponse<Status> = if (realStatus.favourited) unfavouriteStatus(realStatus.id)
+							else favouriteStatus(realStatus.id)
 							if (res.error || res.response == null) {
 								res.handleError(snackbarController)
 								return@bgIO
@@ -572,7 +571,7 @@ fun Status(status: Status) {
 								Icon(painterResource(Res.drawable.icon_repeat_24px), null)
 							},
 							onClick = {
-								navHandler.navigate(StatusInteractionDetailRoute(realStatus.id!!, InteractionViewType.Boost.toString()))
+								navHandler.navigate(StatusInteractionDetailRoute(realStatus.id, InteractionViewType.Boost.toString()))
 							}
 						)
 
@@ -582,7 +581,7 @@ fun Status(status: Status) {
 								Icon(painterResource(Res.drawable.icon_star_24px), null)
 							},
 							onClick = {
-								navHandler.navigate(StatusInteractionDetailRoute(realStatus.id!!, InteractionViewType.Like.toString()))
+								navHandler.navigate(StatusInteractionDetailRoute(realStatus.id, InteractionViewType.Like.toString()))
 							}
 						)
 
@@ -593,7 +592,7 @@ fun Status(status: Status) {
 									Icon(painterResource(Res.drawable.icon_mood_24px), null)
 								},
 								onClick = {
-									navHandler.navigate(StatusInteractionDetailRoute(realStatus.id!!, InteractionViewType.Reaction.toString()))
+									navHandler.navigate(StatusInteractionDetailRoute(realStatus.id, InteractionViewType.Reaction.toString()))
 								}
 							)
 
