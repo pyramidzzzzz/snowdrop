@@ -24,7 +24,3 @@ You can see instructions and helpful tips on contributing in `./CONTRIBUTING.md`
 Pull requests are welcome! Translations can also be submitted on our [Weblate](https://translate.codeberg.org/engage/snowdrop/).
 
 ## Acknowledgments
-
-[outadoc modified](https://github.com/coil-kt/coil/issues/2347#issuecomment-2408047810) a 
-[multiplatform decoder written by colinrtwhite](https://github.com/coil-kt/coil/issues/2347#issuecomment-2392764750) which
-Snowdrop uses to handle GIFs on iOS. This code is used in `shared/src/iosMain/kotlin/site/remlit/snowdrop/util/config/MediaDecoders.ios.kt`.
