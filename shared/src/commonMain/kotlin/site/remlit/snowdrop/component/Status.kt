@@ -385,18 +385,16 @@ fun Status(status: Status) {
 										if (it.me) {
 											coroutineScope.launch {
 												val res = unreactFromStatus(realStatus.id, tempName)
+												realStatus = res.response!!
 												if (isReblog)
 													status.reblog = res.response
-												else
-													realStatus = res.response!!
 											}
 										} else if (!it.name.contains("@")) {
 											coroutineScope.launch {
 												val res = reactToStatus(realStatus.id, tempName)
+												realStatus = res.response!!
 												if (isReblog)
 													status.reblog = res.response
-												else
-													realStatus = res.response!!
 											}
 										} else {
 											coroutineScope.launch {
@@ -481,10 +479,9 @@ fun Status(status: Status) {
 								res.handleError(snackbarController)
 								return@bgIO
 							}
+							realStatus = res.response
 							if (isReblog)
 								status.reblog = res.response
-							else
-								realStatus = res.response
 						}
 					},
 					colors = if (realStatus.reblogged) ButtonDefaults.textButtonColors(
@@ -524,8 +521,6 @@ fun Status(status: Status) {
 							realStatus = res.response
 							if (isReblog)
 								status.reblog = res.response
-							else
-								realStatus = res.response
 						}
 					},
 					colors = if (realStatus.favourited) ButtonDefaults.textButtonColors(
