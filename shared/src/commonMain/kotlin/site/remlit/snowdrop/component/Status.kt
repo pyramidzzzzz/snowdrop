@@ -59,9 +59,11 @@ import site.remlit.snowdrop.ComposeRoute
 import site.remlit.snowdrop.ProfileRoute
 import site.remlit.snowdrop.StatusInteractionDetailRoute
 import site.remlit.snowdrop.ThreadRoute
+import site.remlit.snowdrop.api.statuses.bookmarkStatus
 import site.remlit.snowdrop.api.statuses.favouriteStatus
 import site.remlit.snowdrop.api.statuses.reactToStatus
 import site.remlit.snowdrop.api.statuses.reblogStatus
+import site.remlit.snowdrop.api.statuses.unbookmarkStatus
 import site.remlit.snowdrop.api.statuses.unfavouriteStatus
 import site.remlit.snowdrop.api.statuses.unreactFromStatus
 import site.remlit.snowdrop.api.statuses.unreblogStatus
@@ -592,7 +594,16 @@ fun Status(status: Status) {
 								leadingIcon = {
 									Icon(painterResource(Res.drawable.icon_bookmark_filled_24px), null)
 								},
-								onClick = { }
+								onClick = {
+									coroutineScope.launch {
+										val res = unbookmarkStatus(realStatus.id)
+										realStatus = res.response!!
+										if (isReblog)
+											status.reblog = res.response
+
+										showDropdown = !showDropdown
+									}
+								}
 							)
 						} else {
 							DropdownMenuItem(
@@ -600,7 +611,16 @@ fun Status(status: Status) {
 								leadingIcon = {
 									Icon(painterResource(Res.drawable.icon_bookmark_24px), null)
 								},
-								onClick = { }
+								onClick = {
+									coroutineScope.launch {
+										val res = bookmarkStatus(realStatus.id)
+										realStatus = res.response!!
+										if (isReblog)
+											status.reblog = res.response
+
+										showDropdown = !showDropdown
+									}
+								}
 							)
 						}
 
