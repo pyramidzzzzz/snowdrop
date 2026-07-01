@@ -1,0 +1,125 @@
+package site.remlit.snowdrop.component
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.russhwolf.settings.ExperimentalSettingsApi
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import site.remlit.snowdrop.bottomNavEnterAnimation
+import site.remlit.snowdrop.bottomNavExitAnimation
+import site.remlit.snowdrop.model.Emoji
+import site.remlit.snowdrop.util.blockingSettings
+import site.remlit.snowdrop.util.cache.fetchEmojis
+import snowdrop.shared.generated.resources.Res
+import snowdrop.shared.generated.resources.icon_keyboard_arrow_down_24px
+import snowdrop.shared.generated.resources.icon_keyboard_arrow_up_24px
+import snowdrop.shared.generated.resources.uncategorized
+import kotlin.collections.forEach
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSettingsApi::class)
+@Composable
+fun EmojiPicker(
+	visible: Boolean,
+	onDismiss: () -> Unit,
+	onSelectEmoji: (Emoji) -> Unit
+) {
+	val emojis by fetchEmojis().collectAsStateWithLifecycle(emptyList())
+
+	val categorized = mutableMapOf<String, List<Emoji>>()
+
+	emojis.forEach {
+		val category = it.category ?: stringResource(Res.string.uncategorized)
+		categorized[category] = categorized.getOrElse(category) { mutableListOf() }.plus(it)
+	}
+
+
+	// category state nonsense
+	val categoryVisibility = mutableStateMapOf<String, Boolean>()
+	fun getHiddenKey(category: String) = "emojipicker_category_${category}_hidden"
+	categorized.forEach { (key) ->
+		categoryVisibility[key] = blockingSettings.getBoolean(getHiddenKey(key), false)
+	}
+
+	fun toggleCategory(category: String) {
+		fun getCategoryVisibility(category: String): Boolean = categoryVisibility[category] ?: true
+
+		categoryVisibility[category] = !getCategoryVisibility(category)
+		blockingSettings.putBoolean(getHiddenKey(category), getCategoryVisibility(category))
+	}
+
+
+	AnimatedVisibility(
+		visible = visible,
+		enter = bottomNavEnterAnimation,
+		exit = bottomNavExitAnimation
+	) {
+		ModalBottomSheet(
+			onDismissRequest = onDismiss
+		) {
+			Column(
+				modifier = Modifier.fillMaxSize()
+			) {
+				LazyColumn(
+					modifier = Modifier.weight(1f)
+				) {
+					categorized.forEach { (category, emojis) ->
+						item {
+							Row(
+								modifier = Modifier.clickable(onClick = { toggleCategory(category) })
+									.padding(10.dp)
+									.fillMaxWidth()
+							) {
+								Text(
+									category,
+									fontWeight = FontWeight.Medium
+								)
+
+								if (!(categoryVisibility[category] ?: true)) Icon(painterResource(Res.drawable.icon_keyboard_arrow_down_24px), null)
+								else Icon(painterResource(Res.drawable.icon_keyboard_arrow_up_24px), null)
+							}
+						}
+						item {
+							AnimatedVisibility(
+								visible = !(categoryVisibility[category] ?: true),
+								enter = expandVertically(),
+								exit = shrinkVertically()
+							) {
+								FlowRow(modifier = Modifier.fillMaxWidth()) {
+									emojis.forEach {
+										Box(
+											modifier = Modifier.clickable(onClick = { onSelectEmoji(it) })
+												.padding(5.dp)
+										) {
+											Emoji(it, big = true)
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

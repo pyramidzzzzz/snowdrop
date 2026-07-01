@@ -17,17 +17,23 @@ import coil3.compose.AsyncImage
 import site.remlit.snowdrop.model.Emoji
 
 val emojiSize = 20.dp
+val bigEmojiSize = 40.dp
 
 @Composable
-fun Emoji(emoji: Emoji) {
+fun Emoji(
+	emoji: Emoji,
+	big: Boolean = false
+) {
 	var isLoading by remember { mutableStateOf(true) }
+
+	val size = if (big) bigEmojiSize else emojiSize
 
 	@Composable
 	fun fallback() {
 		Box(
 			modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainerHigh)
-				.height(emojiSize)
-				.width(emojiSize)
+				.height(size)
+				.width(size)
 		)
 	}
 
@@ -37,8 +43,8 @@ fun Emoji(emoji: Emoji) {
 			contentDescription = emoji.shortcode,
 			contentScale = ContentScale.Fit,
 			onSuccess = { isLoading = false },
-			modifier = Modifier.height(emojiSize)
-				.width(emojiSize),
+			modifier = Modifier.height(size)
+				.width(size),
 		)
 		if (isLoading) fallback()
 	}

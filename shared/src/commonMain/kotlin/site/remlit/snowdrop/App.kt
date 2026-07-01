@@ -166,6 +166,10 @@ object DebugRoute
 data class DebugStorageRoute(val storage: Int)
 
 
+val bottomNavEnterAnimation = fadeIn() + slideInVertically(initialOffsetY = { it })
+val bottomNavExitAnimation = slideOutVertically(targetOffsetY = { it }) + fadeOut()
+
+
 @Composable
 @Preview
 @OptIn(ExperimentalSettingsApi::class, ExperimentalMaterial3Api::class)
@@ -268,9 +272,6 @@ fun App() = safe {
 
 		CompositionLocalProvider(LocalNavController provides navController) {
 			CompositionLocalProvider(SnackbarController provides snackbarHostState) {
-
-				val bottomNavEnterAnimation = fadeIn() + slideInVertically(initialOffsetY = { it })
-				val bottomNavExitAnimation = slideOutVertically(targetOffsetY = { it }) + fadeOut()
 
 				Scaffold(
 					bottomBar = {
