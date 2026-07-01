@@ -16,6 +16,7 @@
 
 	<string name="edit_profile">Edit profile</string>
 	<string name="request_to_follow">Request to follow</string>
+	<string name="cancel_request">Cancel request</string>
 	<string name="follow">Follow</string>
 	<string name="unfollow">Unfollow</string>
 
@@ -37,6 +38,8 @@
 	<string name="_continue">Continue</string>
 	<string name="cancel">Cancel</string>
 	<string name="ok">Ok</string>
+	<string name="yes">Yes</string>
+	<string name="no">No</string>
 
 	<string name="debug">Debug</string>
 
@@ -114,4 +117,8 @@
 	<string name="emoji">Emoji</string>
 	<string name="add_emoji">Add emoji</string>
 	<string name="uncategorized">Uncategorized</string>
+
+	<string name="are_you_sure_you_want_to_cancel_your_follow_request">Are you sure you want to cancel your follow request to @%1$s?</string>
+	<string name="are_you_sure_you_want_to_unfollow">Are you sure you want to unfollow @%1$s?</string>
+	<string name="are_you_sure_you_want_to_send_a_follow_request">Are you sure you want to send a follow request to @%1$s?</string>
 </resources>

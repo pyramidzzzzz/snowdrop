@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
@@ -27,6 +28,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -41,6 +43,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.russhwolf.settings.ExperimentalSettingsApi
 import io.kamel.image.KamelImage
@@ -67,6 +71,12 @@ import site.remlit.snowdrop.util.extension.formatNumber
 import site.remlit.snowdrop.util.getCurrentAccountObjectFlow
 import site.remlit.snowdrop.util.settings
 import snowdrop.shared.generated.resources.Res
+import snowdrop.shared.generated.resources._continue
+import snowdrop.shared.generated.resources.are_you_sure_you_want_to_cancel_your_follow_request
+import snowdrop.shared.generated.resources.are_you_sure_you_want_to_send_a_follow_request
+import snowdrop.shared.generated.resources.are_you_sure_you_want_to_unfollow
+import snowdrop.shared.generated.resources.cancel
+import snowdrop.shared.generated.resources.cancel_request
 import snowdrop.shared.generated.resources.edit_profile
 import snowdrop.shared.generated.resources.follow
 import snowdrop.shared.generated.resources.followers
@@ -80,6 +90,7 @@ import snowdrop.shared.generated.resources.profile
 import snowdrop.shared.generated.resources.request_to_follow
 import snowdrop.shared.generated.resources.unfollow
 import snowdrop.shared.generated.resources.x_posts
+import snowdrop.shared.generated.resources.yes
 
 const val headerHeight = 200
 
@@ -218,6 +229,59 @@ fun ProfileView(id: String) = ViewSurface {
 								horizontalArrangement = Arrangement.End
 							) {
 								Row {
+									fun follow() = bg {
+										val res = followAccount(account!!.id)
+										if (res.error || res.response == null) {
+											res.handleError(snackbarHandler)
+											return@bg
+										}
+										relationship = res.response
+									}
+
+									fun unfollow() = bg {
+										val res = unfollowAccount(account!!.id)
+										if (res.error || res.response == null) {
+											res.handleError(snackbarHandler)
+											return@bg
+										}
+										relationship = res.response
+									}
+
+									var showRelationshipActionWarning by remember { mutableStateOf(false) }
+
+									if (showRelationshipActionWarning)
+										AlertDialog(
+											text = {
+												if (relationship!!.following || relationship!!.requested) {
+													if (relationship!!.requested) Text(stringResource(Res.string.are_you_sure_you_want_to_cancel_your_follow_request, account!!.acct))
+													else Text(stringResource(Res.string.are_you_sure_you_want_to_unfollow, account!!.acct))
+												} else {
+													if (account!!.locked) Text(stringResource(Res.string.are_you_sure_you_want_to_send_a_follow_request, account!!.acct))
+												}
+											},
+											dismissButton = {
+												TextButton(
+													onClick = { showRelationshipActionWarning = !showRelationshipActionWarning }
+												) {
+													Text(stringResource(Res.string.cancel))
+												}
+											},
+											confirmButton = {
+												TextButton(
+													onClick = {
+														if (relationship!!.following || relationship!!.requested) unfollow()
+														else follow()
+
+														showRelationshipActionWarning = !showRelationshipActionWarning
+													}
+												) {
+													Text(stringResource(Res.string.yes))
+												}
+											},
+											onDismissRequest = { showRelationshipActionWarning = !showRelationshipActionWarning },
+											modifier = Modifier,
+										)
+
 									if (isMe) {
 										OutlinedButton(onClick = {
 											bg { snackbarHandler.showSnackbar("Not implemented") }
@@ -225,38 +289,24 @@ fun ProfileView(id: String) = ViewSurface {
 											Text(stringResource(Res.string.edit_profile))
 										}
 									} else if (relationship != null) {
-										if (relationship!!.following) {
+										if (relationship!!.following || relationship!!.requested) {
 											OutlinedButton(
-												onClick = {
-													// todo: add confirmation to unfollow
-													bg {
-														val res = unfollowAccount(account!!.id)
-														if (res.error || res.response == null) {
-															res.handleError(snackbarHandler)
-															return@bg
-														}
-														relationship = res.response
-													}
-												},
+												onClick = { showRelationshipActionWarning = !showRelationshipActionWarning },
 												border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.error),
 												colors = ButtonDefaults.outlinedButtonColors(
 													contentColor = MaterialTheme.colorScheme.error
 												)
 											) {
-												Text(stringResource(Res.string.unfollow))
+												if (relationship!!.requested) Text(stringResource(Res.string.cancel_request))
+												else Text(stringResource(Res.string.unfollow))
 											}
 										} else {
 											FilledTonalButton(
 												onClick = {
 													// todo: add confirmation to follow- only if account is locked
-													bg {
-														val res = followAccount(account!!.id)
-														if (res.error || res.response == null) {
-															res.handleError(snackbarHandler)
-															return@bg
-														}
-														relationship = res.response
-													}
+													if (account!!.locked) {
+														showRelationshipActionWarning = !showRelationshipActionWarning
+													} else follow()
 												}
 											) {
 												if (account!!.locked) Text(stringResource(Res.string.request_to_follow))

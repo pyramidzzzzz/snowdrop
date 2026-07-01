@@ -10,7 +10,7 @@ data class Relationship(
 	val following: Boolean = false,
 	@SerialName("followed_by")
 	val followedBy: Boolean = false,
-	val requests: Boolean = false,
+	val requested: Boolean = false,
 
 	val blocking: Boolean = false,
 	@SerialName("blocked_by")

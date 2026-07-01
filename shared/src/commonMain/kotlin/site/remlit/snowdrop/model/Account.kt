@@ -59,6 +59,8 @@ data class Account(
 	@SerialName("last_status_at")
 	val lastStatusAt: String? = null,
 ) : IdentifiableObject<String> {
+	fun displayName(): String = displayName?.ifBlank { null } ?: username
+
 	@Serializable
 	data class Field(
 		val name: String,
