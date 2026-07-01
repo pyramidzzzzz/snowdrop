@@ -43,7 +43,7 @@ kotlin {
 			implementation(libs.ktor.client.okhttp)
 			implementation(libs.kotlinx.coroutines.android)
 
-			implementation(libs.coil.gif)
+			implementation(libs.kamel.decoder.image.bitmap.resizing)
 		}
 		iosMain.dependencies {
 			implementation(libs.ktor.client.darwin)
@@ -71,8 +71,12 @@ kotlin {
 
 			implementation(libs.kermit)
 			implementation(libs.htmlconverter)
-			implementation(libs.coil.compose)
-			implementation(libs.coil.network.ktor3)
+
+			// kamel, image handling
+			implementation(libs.kamel.image)
+			implementation(libs.kamel.image.default)
+			implementation(libs.kamel.decoder.animated.image)
+			implementation(libs.kamel.decoder.image.bitmap)
 		}
 		commonTest.dependencies {
 			implementation(libs.kotlin.test)

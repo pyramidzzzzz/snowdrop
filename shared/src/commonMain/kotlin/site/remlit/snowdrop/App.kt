@@ -63,13 +63,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import co.touchlab.kermit.Logger
-import coil3.ImageLoader
-import coil3.compose.AsyncImage
-import coil3.compose.setSingletonImageLoaderFactory
-import coil3.decode.Decoder
-import coil3.disk.DiskCache
-import coil3.request.crossfade
 import com.russhwolf.settings.ExperimentalSettingsApi
+import io.kamel.image.KamelImage
+import io.kamel.image.asyncPainterResource
+import io.kamel.image.config.LocalKamelConfig
 import io.ktor.http.Url
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
@@ -90,7 +87,7 @@ import site.remlit.snowdrop.util.scrollingUpward
 import site.remlit.snowdrop.util.settings
 import site.remlit.snowdrop.util.setupAppSettings
 import site.remlit.snowdrop.util.cache.setupCache
-import site.remlit.snowdrop.util.config.getGifDecoder
+import site.remlit.snowdrop.util.config.kamelConfig
 import site.remlit.snowdrop.util.getAccountObjectFlow
 import site.remlit.snowdrop.util.getAccounts
 import site.remlit.snowdrop.util.getCurrentAccountId
@@ -118,7 +115,6 @@ import snowdrop.shared.generated.resources.icon_notifications_filled_24px
 import snowdrop.shared.generated.resources.notifications
 import snowdrop.shared.generated.resources.profile
 import snowdrop.shared.generated.resources.timeline
-import kotlin.reflect.KClass
 import kotlin.time.Duration.Companion.milliseconds
 
 
@@ -142,7 +138,7 @@ data class ProfileRoute(val id: String)
 @Serializable
 data class ThreadRoute(val id: String)
 /**
- * @param type [site.remlit.snowdrop.view.InteractionViewType] as a string
+ * @param type [InteractionViewType] as a string
  * */
 @Serializable
 data class StatusInteractionDetailRoute(
@@ -176,15 +172,6 @@ val bottomNavExitAnimation = slideOutVertically(targetOffsetY = { it }) + fadeOu
 fun App() = safe {
 	setupAppSettings()
 	setupCache()
-
-	setSingletonImageLoaderFactory { context ->
-		ImageLoader.Builder(context)
-			.components {
-				add(getGifDecoder())
-			}
-			.crossfade(100)
-			.build()
-	}
 
 	/*
 	* Variables & Handlers for Whole App Stuff
@@ -268,278 +255,281 @@ fun App() = safe {
 		else Icon(painterResource(Res.drawable.icon_account_circle_24px), null)
 	}
 
-	AppTheme {
-
+	// this composable makes it easier to view and understand the composition
+	// local providers which wrap the app
+	@Composable
+	fun Provided(content: @Composable () -> Unit) {
 		CompositionLocalProvider(LocalNavController provides navController) {
 			CompositionLocalProvider(SnackbarController provides snackbarHostState) {
+				CompositionLocalProvider(LocalKamelConfig provides kamelConfig) {
+					content()
+				}
+			}
+		}
+	}
 
-				Scaffold(
-					bottomBar = {
-						AnimatedVisibility(
-							visible = (loggedIn == true && !shouldHideBottomBar()),
-							enter = bottomNavEnterAnimation,
-							exit = bottomNavExitAnimation,
-						) {
-							NavigationBar {
-								NavigationBarItem(
-									selected = atRoute<TimelineRoute>(currentDest),
-									onClick = {
-										if (!atRoute<TimelineRoute>(currentDest))
-											navController.navigate(TimelineRoute)
-									},
-									icon = {
-										if (atRoute<TimelineRoute>(currentDest)) Icon(
-											painterResource(Res.drawable.icon_home_filled_24px),
-											null
-										)
-										else Icon(painterResource(Res.drawable.icon_home_24px), null)
-									},
-									label = { Text(stringResource(Res.string.timeline)) }
-								)
+	AppTheme {
+		Provided {
 
-								NavigationBarItem(
-									selected = atRoute<NotificationsRoute>(currentDest),
-									onClick = { navController.navigate(NotificationsRoute) },
-									icon = {
-										if (atRoute<NotificationsRoute>(currentDest)) Icon(
-											painterResource(Res.drawable.icon_notifications_filled_24px),
-											null
-										)
-										else Icon(painterResource(Res.drawable.icon_notifications_24px), null)
-									},
-									label = { Text(stringResource(Res.string.notifications)) }
-								)
-
-								NavigationBarItem(
-									selected = atRoute<ExploreRoute>(currentDest),
-									onClick = { navController.navigate(ExploreRoute) },
-									icon = {
-										if (atRoute<ExploreRoute>(currentDest)) Icon(
-											painterResource(Res.drawable.icon_explore_filled_24px),
-											null
-										)
-										else Icon(painterResource(Res.drawable.icon_explore_24px), null)
-									},
-									label = { Text(stringResource(Res.string.explore)) }
-								)
-
-								NavigationBarItem(
-									selected = atRoute<MyProfileRoute>(currentDest),
-									onClick = {},
-									interactionSource = accountSwitcherInteractionSource, // handles the actual clicks
-									icon = {
-										var avatarLoading by remember { mutableStateOf(true) }
-
-										if (account != null && account!!.avatar != null) {
-											Box {
-												AsyncImage(
-													model = account!!.avatarStatic ?: account!!.avatar,
-													contentDescription = account!!.avatarDescription,
-													contentScale = ContentScale.Crop,
-													onSuccess = { avatarLoading = false },
-													modifier = Modifier.clip(CircleShape)
-														.height(24.dp)
-														.width(24.dp)
-												)
-												if (avatarLoading) fallbackAvatarIcon()
-											}
-										} else fallbackAvatarIcon()
-									},
-									label = { Text(stringResource(Res.string.profile)) }
-								)
-							}
-						}
-					},
-					floatingActionButton = {
-						AnimatedVisibility(
-							visible = shouldShowComposeFab(),
-							enter = bottomNavEnterAnimation,
-							exit = bottomNavExitAnimation,
-						) {
-							FloatingActionButton(
-								onClick = { navController.navigate(ComposeRoute()) }
-							) {
-								if (atRoute<ProfileRoute>(currentDest)) Icon(painterResource(Res.drawable.icon_alternate_email_24px), null)
-								else Icon(painterResource(Res.drawable.icon_edit_square_24px), null)
-							}
-						}
-					},
-					floatingActionButtonPosition = FabPosition.End,
-					snackbarHost = {
-						SnackbarHost(hostState = snackbarHostState)
-					}
-				) { bottomPadding ->
-					Column(
-						modifier = Modifier.padding(bottom = bottomPadding.calculateBottomPadding())
+			Scaffold(
+				bottomBar = {
+					AnimatedVisibility(
+						visible = (loggedIn == true && !shouldHideBottomBar()),
+						enter = bottomNavEnterAnimation,
+						exit = bottomNavExitAnimation,
 					) {
-						if (showAccountSwitcher)
-							ModalBottomSheet(
-								onDismissRequest = { showAccountSwitcher = false }
-							) {
-								// todo: redesign this. cards look bad!
-								getAccounts().forEach { it ->
-									val account by getAccountObjectFlow(it)
-										.collectAsStateWithLifecycle(null)
+						NavigationBar {
+							NavigationBarItem(
+								selected = atRoute<TimelineRoute>(currentDest),
+								onClick = {
+									navController.navigate(TimelineRoute)
+								},
+								icon = {
+									if (atRoute<TimelineRoute>(currentDest)) Icon(
+										painterResource(Res.drawable.icon_home_filled_24px),
+										null
+									)
+									else Icon(painterResource(Res.drawable.icon_home_24px), null)
+								},
+								label = { Text(stringResource(Res.string.timeline)) }
+							)
 
-									if (account != null) {
-										Card(
-											modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 5.dp)
-												.clip(RoundedCornerShape(10.dp))
-												.fillMaxWidth()
-												.clickable {
-													if (it != getCurrentAccountId())
-														switchAccount(it, navController)
-												},
-											colors = CardDefaults.cardColors(
-												containerColor = if (getCurrentAccountId() == it)
-													MaterialTheme.colorScheme.secondaryContainer
-												else MaterialTheme.colorScheme.surfaceContainerLow,
-												contentColor = if (getCurrentAccountId() == it)
-													MaterialTheme.colorScheme.onPrimaryContainer
-												else MaterialTheme.colorScheme.onSurface,
-											)
+							NavigationBarItem(
+								selected = atRoute<NotificationsRoute>(currentDest),
+								onClick = { navController.navigate(NotificationsRoute) },
+								icon = {
+									if (atRoute<NotificationsRoute>(currentDest)) Icon(
+										painterResource(Res.drawable.icon_notifications_filled_24px),
+										null
+									)
+									else Icon(painterResource(Res.drawable.icon_notifications_24px), null)
+								},
+								label = { Text(stringResource(Res.string.notifications)) }
+							)
+
+							NavigationBarItem(
+								selected = atRoute<ExploreRoute>(currentDest),
+								onClick = { navController.navigate(ExploreRoute) },
+								icon = {
+									if (atRoute<ExploreRoute>(currentDest)) Icon(
+										painterResource(Res.drawable.icon_explore_filled_24px),
+										null
+									)
+									else Icon(painterResource(Res.drawable.icon_explore_24px), null)
+								},
+								label = { Text(stringResource(Res.string.explore)) }
+							)
+
+							NavigationBarItem(
+								selected = atRoute<MyProfileRoute>(currentDest),
+								onClick = {},
+								interactionSource = accountSwitcherInteractionSource, // handles the actual clicks
+								icon = {
+									if (account != null && account!!.avatar != null) {
+										KamelImage(
+											resource = { asyncPainterResource(account!!.avatarStatic ?: account!!.avatar!!) },
+											contentDescription = account!!.avatarDescription,
+											contentScale = ContentScale.Crop,
+											onLoading = { fallbackAvatarIcon() },
+											modifier = Modifier.clip(CircleShape)
+												.height(24.dp)
+												.width(24.dp)
+										)
+									} else fallbackAvatarIcon()
+								},
+								label = { Text(stringResource(Res.string.profile)) }
+							)
+						}
+					}
+				},
+				floatingActionButton = {
+					AnimatedVisibility(
+						visible = shouldShowComposeFab(),
+						enter = bottomNavEnterAnimation,
+						exit = bottomNavExitAnimation,
+					) {
+						FloatingActionButton(
+							onClick = { navController.navigate(ComposeRoute()) }
+						) {
+							if (atRoute<ProfileRoute>(currentDest)) Icon(painterResource(Res.drawable.icon_alternate_email_24px), null)
+							else Icon(painterResource(Res.drawable.icon_edit_square_24px), null)
+						}
+					}
+				},
+				floatingActionButtonPosition = FabPosition.End,
+				snackbarHost = {
+					SnackbarHost(hostState = snackbarHostState)
+				}
+			) { bottomPadding ->
+				Column(
+					modifier = Modifier.padding(bottom = bottomPadding.calculateBottomPadding())
+				) {
+					if (showAccountSwitcher)
+						ModalBottomSheet(
+							onDismissRequest = { showAccountSwitcher = false }
+						) {
+							// todo: redesign this. cards look bad!
+							getAccounts().forEach { it ->
+								val account by getAccountObjectFlow(it)
+									.collectAsStateWithLifecycle(null)
+
+								if (account != null) {
+									Card(
+										modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 5.dp)
+											.clip(RoundedCornerShape(10.dp))
+											.fillMaxWidth()
+											.clickable {
+												if (it != getCurrentAccountId())
+													switchAccount(it, navController)
+											},
+										colors = CardDefaults.cardColors(
+											containerColor = if (getCurrentAccountId() == it)
+												MaterialTheme.colorScheme.secondaryContainer
+											else MaterialTheme.colorScheme.surfaceContainerLow,
+											contentColor = if (getCurrentAccountId() == it)
+												MaterialTheme.colorScheme.onPrimaryContainer
+											else MaterialTheme.colorScheme.onSurface,
+										)
+									) {
+										Row(
+											modifier = Modifier.padding(10.dp),
+											horizontalArrangement = Arrangement.spacedBy(10.dp),
+											verticalAlignment = Alignment.CenterVertically
 										) {
-											Row(
-												modifier = Modifier.padding(10.dp),
-												horizontalArrangement = Arrangement.spacedBy(10.dp),
-												verticalAlignment = Alignment.CenterVertically
-											) {
-												Avatar(account!!)
+											Avatar(account!!)
 
-												Column {
-													Text(
-														account!!.displayName ?: account!!.url,
-														fontWeight = FontWeight.Medium
-													)
-													Text("@${account!!.acct}")
-												}
+											Column {
+												Text(
+													account!!.displayName ?: account!!.url,
+													fontWeight = FontWeight.Medium
+												)
+												Text("@${account!!.acct}")
 											}
 										}
 									}
 								}
+							}
 
-								TextButton(
-									modifier = Modifier.padding(all = 10.dp).fillMaxWidth(),
-									onClick = {
-										showAccountSwitcher = false
-										addNewAccount(navController)
-									}
-								) {
-									Icon(painterResource(Res.drawable.icon_add_24px), null)
-									Text(stringResource(Res.string.add_account))
+							TextButton(
+								modifier = Modifier.padding(all = 10.dp).fillMaxWidth(),
+								onClick = {
+									showAccountSwitcher = false
+									addNewAccount(navController)
 								}
-							}
-
-						NavHost(
-							navController = navController,
-							startDestination = StartRoute,
-							enterTransition = { EnterTransition.None },
-							exitTransition = { ExitTransition.None },
-							popEnterTransition = { EnterTransition.None },
-							popExitTransition = { ExitTransition.None }
-						) {
-							composable<StartRoute> {
-								StartView(
-									navigateToLogin = { navController.navigate(LoginRoute) },
-									navigateToTimeline = { navController.navigate(TimelineRoute) },
-								)
-							}
-
-							composable<LoginRoute> {
-								LoginView(
-									navigateToTimeline = { navController.navigate(TimelineRoute) },
-								)
-							}
-							composable<TimelineRoute> { TimelineView() }
-							composable<NotificationsRoute> { NotificationsView() }
-							composable<ExploreRoute> { ExploreView() }
-							composable<MyProfileRoute> {
-								if (account != null) ProfileView(account!!.id)
-								else Text("Error")
-							}
-
-							composable<ThreadRoute>(
-								enterTransition = { slideIntoContainer(
-									AnimatedContentTransitionScope.SlideDirection.Start, tween(
-										250
-									)
-								) },
-								exitTransition = { slideOutOfContainer(
-									AnimatedContentTransitionScope.SlideDirection.End, tween(
-										200
-									)
-								) }
 							) {
-								val args = it.toRoute<ThreadRoute>()
-								ThreadView(args.id)
-							}
-							composable<StatusInteractionDetailRoute> {
-								val args = it.toRoute<StatusInteractionDetailRoute>()
-								StatusInteractionDetailView(args.id, InteractionViewType.valueOf(args.type))
-							}
-							composable<ProfileRoute>(
-								enterTransition = { slideIntoContainer(
-									AnimatedContentTransitionScope.SlideDirection.Start, tween(
-										250
-									)
-								) },
-								exitTransition = { slideOutOfContainer(
-									AnimatedContentTransitionScope.SlideDirection.End, tween(
-										200
-									)
-								) }
-							) {
-								val args = it.toRoute<ProfileRoute>()
-								ProfileView(args.id)
-							}
-
-							composable<ComposeRoute>(
-								enterTransition = { slideIntoContainer(
-									AnimatedContentTransitionScope.SlideDirection.Start, tween(
-										250
-									)
-								) },
-								exitTransition = { slideOutOfContainer(
-									AnimatedContentTransitionScope.SlideDirection.End, tween(
-										200
-									)
-								) }
-							) {
-								val args = it.toRoute<ComposeRoute>()
-								ComposeView(
-									args.inReplyToId,
-									args.cw,
-									args.content,
-									args.visibility
-								)
-							}
-
-							// Settings
-							composable<SettingsRoute>(
-								enterTransition = { slideIntoContainer(
-									AnimatedContentTransitionScope.SlideDirection.Start, tween(
-										250
-									)
-								) },
-								exitTransition = { slideOutOfContainer(
-									AnimatedContentTransitionScope.SlideDirection.End, tween(
-										200
-									)
-								) }
-							) { SettingsView() }
-
-							// Debug
-							composable<DebugRoute> { DebugView() }
-							composable<DebugStorageRoute> {
-								val args = it.toRoute<DebugStorageRoute>()
-								DebugStorageView(args.storage)
+								Icon(painterResource(Res.drawable.icon_add_24px), null)
+								Text(stringResource(Res.string.add_account))
 							}
 						}
-					}
 
+					NavHost(
+						navController = navController,
+						startDestination = StartRoute,
+						enterTransition = { EnterTransition.None },
+						exitTransition = { ExitTransition.None },
+						popEnterTransition = { EnterTransition.None },
+						popExitTransition = { ExitTransition.None }
+					) {
+						composable<StartRoute> {
+							StartView(
+								navigateToLogin = { navController.navigate(LoginRoute) },
+								navigateToTimeline = { navController.navigate(TimelineRoute) },
+							)
+						}
+
+						composable<LoginRoute> {
+							LoginView(
+								navigateToTimeline = { navController.navigate(TimelineRoute) },
+							)
+						}
+						composable<TimelineRoute> { TimelineView() }
+						composable<NotificationsRoute> { NotificationsView() }
+						composable<ExploreRoute> { ExploreView() }
+						composable<MyProfileRoute> {
+							if (account != null) ProfileView(account!!.id)
+							else Text("Error")
+						}
+
+						composable<ThreadRoute>(
+							enterTransition = { slideIntoContainer(
+								AnimatedContentTransitionScope.SlideDirection.Start, tween(
+									250
+								)
+							) },
+							exitTransition = { slideOutOfContainer(
+								AnimatedContentTransitionScope.SlideDirection.End, tween(
+									200
+								)
+							) }
+						) {
+							val args = it.toRoute<ThreadRoute>()
+							ThreadView(args.id)
+						}
+						composable<StatusInteractionDetailRoute> {
+							val args = it.toRoute<StatusInteractionDetailRoute>()
+							StatusInteractionDetailView(args.id, InteractionViewType.valueOf(args.type))
+						}
+						composable<ProfileRoute>(
+							enterTransition = { slideIntoContainer(
+								AnimatedContentTransitionScope.SlideDirection.Start, tween(
+									250
+								)
+							) },
+							exitTransition = { slideOutOfContainer(
+								AnimatedContentTransitionScope.SlideDirection.End, tween(
+									200
+								)
+							) }
+						) {
+							val args = it.toRoute<ProfileRoute>()
+							ProfileView(args.id)
+						}
+
+						composable<ComposeRoute>(
+							enterTransition = { slideIntoContainer(
+								AnimatedContentTransitionScope.SlideDirection.Start, tween(
+									250
+								)
+							) },
+							exitTransition = { slideOutOfContainer(
+								AnimatedContentTransitionScope.SlideDirection.End, tween(
+									200
+								)
+							) }
+						) {
+							val args = it.toRoute<ComposeRoute>()
+							ComposeView(
+								args.inReplyToId,
+								args.cw,
+								args.content,
+								args.visibility
+							)
+						}
+
+						// Settings
+						composable<SettingsRoute>(
+							enterTransition = { slideIntoContainer(
+								AnimatedContentTransitionScope.SlideDirection.Start, tween(
+									250
+								)
+							) },
+							exitTransition = { slideOutOfContainer(
+								AnimatedContentTransitionScope.SlideDirection.End, tween(
+									200
+								)
+							) }
+						) { SettingsView() }
+
+						// Debug
+						composable<DebugRoute> { DebugView() }
+						composable<DebugStorageRoute> {
+							val args = it.toRoute<DebugStorageRoute>()
+							DebugStorageView(args.storage)
+						}
+					}
 				}
 			}
-		}
 
+		}
 	}
 }

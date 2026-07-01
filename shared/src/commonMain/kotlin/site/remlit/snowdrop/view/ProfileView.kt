@@ -42,10 +42,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
-import coil3.compose.LocalPlatformContext
-import coil3.request.ImageRequest
 import com.russhwolf.settings.ExperimentalSettingsApi
+import io.kamel.image.KamelImage
+import io.kamel.image.asyncPainterResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import site.remlit.snowdrop.ProfileRoute
@@ -65,9 +64,7 @@ import site.remlit.snowdrop.util.bg
 import site.remlit.snowdrop.util.bgIO
 import site.remlit.snowdrop.util.cache.fetchAccount
 import site.remlit.snowdrop.util.extension.formatNumber
-import site.remlit.snowdrop.util.extension.toPixelsRounded
 import site.remlit.snowdrop.util.getCurrentAccountObjectFlow
-import site.remlit.snowdrop.util.getScreenWidth
 import site.remlit.snowdrop.util.settings
 import snowdrop.shared.generated.resources.Res
 import snowdrop.shared.generated.resources.edit_profile
@@ -92,7 +89,6 @@ fun ProfileView(id: String) = ViewSurface {
 	val navHandler = LocalNavController.current
 	val snackbarHandler = SnackbarController.current
 	val currentDest = navHandler.currentDestination
-	val context = LocalPlatformContext.current
 
 	/* Preferences */
 	val hideFollowCounters by settings.getBooleanFlow("hide_follow_counters", false)
@@ -182,22 +178,15 @@ fun ProfileView(id: String) = ViewSurface {
 						)
 					}
 
-					var isHeaderLoading by remember { mutableStateOf(true) }
-
 					if (account!!.header != null) {
-						Box {
-							AsyncImage(
-								model = ImageRequest.Builder(context).data(account!!.headerStatic ?: account!!.header)
-									.size(200.dp.toPixelsRounded(), getScreenWidth())
-									.build(),
-								contentDescription = account!!.headerDescription,
-								contentScale = ContentScale.Crop,
-								onSuccess = { isHeaderLoading = false },
-								modifier = Modifier.height(headerHeight.dp)
-									.fillMaxWidth(),
-							)
-							if (isHeaderLoading) fallbackHeader()
-						}
+						KamelImage(
+							resource = { asyncPainterResource(account!!.headerStatic ?: account!!.header!!) },
+							contentDescription = account!!.headerDescription,
+							contentScale = ContentScale.Crop,
+							onLoading = { fallbackHeader() },
+							modifier = Modifier.height(headerHeight.dp)
+								.fillMaxWidth(),
+						)
 					} else fallbackHeader()
 
 					// The Rest

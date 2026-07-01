@@ -7,20 +7,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
-import coil3.compose.LocalPlatformContext
-import coil3.request.ImageRequest
+import io.kamel.image.KamelImage
+import io.kamel.image.asyncPainterResource
 import site.remlit.snowdrop.model.Account
-import site.remlit.snowdrop.util.extension.toPixels
-import site.remlit.snowdrop.util.extension.toPixelsRounded
 
 const val bigAvatarSize = 84
 const val avatarSize = 48
@@ -39,8 +32,6 @@ fun Avatar(
 	small: Boolean = false,
 	smaller: Boolean = false
 ) {
-	val context = LocalPlatformContext.current
-
 	val size = if (big) bigAvatarSize.dp
 		else if (small) smallAvatarSize.dp
 		else if (smaller) smallerAvatarSize.dp
@@ -49,8 +40,6 @@ fun Avatar(
 		else if (small) smallAvatarRadius.dp
 		else if (smaller) smallerAvatarRadius.dp
 		else avatarRadius.dp
-
-	var isLoading by remember { mutableStateOf(true) }
 
 	@Composable
 	fun fallback() {
@@ -63,19 +52,14 @@ fun Avatar(
 	}
 
 	if (account.avatar != null) {
-		Box {
-			AsyncImage(
-				model = ImageRequest.Builder(context).data(account.avatarStatic ?: account.avatar)
-					.size(size.toPixelsRounded())
-					.build(),
-				contentDescription = account.avatarDescription,
-				contentScale = ContentScale.Crop,
-				onSuccess = { isLoading = false },
-				modifier = Modifier.clip(RoundedCornerShape(radius))
-					.height(size)
-					.width(size),
-			)
-			if (isLoading) fallback()
-		}
+		KamelImage(
+			resource = { asyncPainterResource(account.avatarStatic ?: account.avatar) },
+			contentDescription = account.avatarDescription,
+			contentScale = ContentScale.Crop,
+			onLoading = { fallback() },
+			modifier = Modifier.clip(RoundedCornerShape(radius))
+				.height(size)
+				.width(size),
+		)
 	} else fallback()
 }
