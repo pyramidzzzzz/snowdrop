@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,48 +11,37 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.russhwolf.settings.ExperimentalSettingsApi
-import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import site.remlit.snowdrop.api.statuses.createStatus
@@ -62,6 +50,7 @@ import site.remlit.snowdrop.component.EmojiPicker
 import site.remlit.snowdrop.component.MiniStatus
 import site.remlit.snowdrop.component.ViewSurface
 import site.remlit.snowdrop.component.Visibility
+import site.remlit.snowdrop.model.Status
 import site.remlit.snowdrop.model.request.CreateStatusRequest
 import site.remlit.snowdrop.util.LocalNavController
 import site.remlit.snowdrop.util.SnackbarController
@@ -69,14 +58,10 @@ import site.remlit.snowdrop.util.WarningColor25
 import site.remlit.snowdrop.util.bgIO
 import site.remlit.snowdrop.util.blockingSettings
 import site.remlit.snowdrop.util.cache.fetchStatus
-import site.remlit.snowdrop.util.cache.fetchStatusOrNull
 import site.remlit.snowdrop.util.getCurrentAccountObjectFlow
-import site.remlit.snowdrop.util.settings
-import site.remlit.snowdrop.util.showAccountSwitcher
 import snowdrop.shared.generated.resources.Res
 import snowdrop.shared.generated.resources.compose
 import snowdrop.shared.generated.resources.content_warning
-import snowdrop.shared.generated.resources.followers
 import snowdrop.shared.generated.resources.icon_close_24px
 import snowdrop.shared.generated.resources.icon_globe_20px
 import snowdrop.shared.generated.resources.icon_home_20px
@@ -84,7 +69,6 @@ import snowdrop.shared.generated.resources.icon_lock_20px
 import snowdrop.shared.generated.resources.icon_mail_20px
 import snowdrop.shared.generated.resources.icon_mood_24px
 import snowdrop.shared.generated.resources.icon_send_24px
-import snowdrop.shared.generated.resources.icon_swap_horiz_24px
 import snowdrop.shared.generated.resources.icon_warning_24px
 import snowdrop.shared.generated.resources.reply
 import snowdrop.shared.generated.resources.visibility_direct
@@ -96,7 +80,6 @@ import snowdrop.shared.generated.resources.visibility_public_description
 import snowdrop.shared.generated.resources.visibility_unlisted
 import snowdrop.shared.generated.resources.visibility_unlisted_description
 import snowdrop.shared.generated.resources.write_your_post_here
-import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 @OptIn(ExperimentalSettingsApi::class)
@@ -128,8 +111,12 @@ fun ComposeView(
 			?: blockingSettings.getString("default_visibility", "public"))
 	}
 
-	val replyTarget by fetchStatusOrNull(inReplyToId)
-		.collectAsStateWithLifecycle(null)
+	var replyTarget by remember { mutableStateOf<Status?>(null) }
+	LaunchedEffect(inReplyToId) {
+		if (inReplyToId != null) fetchStatus(inReplyToId).collect {
+			replyTarget = it
+		}
+	}
 
 	// can submit stuff
 	canSubmit = !content.isBlank()
